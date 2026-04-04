@@ -9,13 +9,14 @@ import (
 )
 
 type Config struct {
-	DBHost     string `env:"DB_HOST" env-required:"true"`
-	DBPort     int    `env:"DB_PORT" env-required:"true"`
-	DBPassword string `env:"DB_PASS" env-required:"true"`
-	DBUser     string `env:"DB_USER" env-required:"true"`
-	DBName     string `env:"DB_NAME" env-required:"true"`
+	DBHost     string `env:"DB_HOST"`
+	DBPort     int    `env:"DB_PORT"`
+	DBPassword string `env:"DB_PASS"`
+	DBUser     string `env:"DB_USER"`
+	DBName     string `env:"DB_NAME"`
 	LogLevel   string `env:"LOG_LEVEL" env-default:"INFO"`
 	Mode       string `env:"MODE" env-default:"DEV"`
+	Port       int    `env:"PORT" env-default:"9000"`
 }
 
 func NewConfig() (*Config, error) {
