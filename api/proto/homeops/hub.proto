@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeops";
+
+service Hub {
+  rpc Ping (google.protobuf.Empty) returns (PongResponse) {}
+}
+
+message PongResponse {
+  string pong = 1;
+}
