@@ -1,11 +1,11 @@
 package log
 
 import (
+	"io"
 	"os"
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 type cfgLogStore interface {
@@ -13,15 +13,17 @@ type cfgLogStore interface {
 	GetMode() string
 }
 
-func Init(cfg cfgLogStore) {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+func NewLogger(cfg cfgLogStore) zerolog.Logger {
+	var output io.Writer = os.Stdout
 
 	if cfg.GetMode() != "PROD" {
-		log.Logger = log.Output(zerolog.ConsoleWriter{
+		output = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			TimeFormat: time.Kitchen,
-		})
-	} else {
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		}
 	}
+
+	level := cfg.GetLogLevel()
+
+	return zerolog.New(output).Level(level).With().Timestamp().Logger()
 }
