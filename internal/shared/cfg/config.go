@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/rs/zerolog"
 )
 
 type Config struct {
@@ -39,4 +40,16 @@ func (c *Config) GetURLPostgres() string {
 		c.DBHost,
 		c.DBPort,
 		c.DBName)
+}
+
+func (c *Config) GetLogLevel() zerolog.Level {
+	level, err := zerolog.ParseLevel(c.LogLevel)
+	if err != nil {
+		return zerolog.InfoLevel
+	}
+	return level
+}
+
+func (c *Config) GetMode() string {
+	return c.Mode
 }
