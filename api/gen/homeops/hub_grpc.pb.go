@@ -20,7 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Hub_Ping_FullMethodName = "/Hub/Ping"
+	Hub_Ping_FullMethodName          = "/Hub/Ping"
+	Hub_RegisterAgent_FullMethodName = "/Hub/RegisterAgent"
 )
 
 // HubClient is the client API for Hub service.
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HubClient interface {
 	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PongResponse, error)
+	RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
 }
 
 type hubClient struct {
@@ -48,11 +50,22 @@ func (c *hubClient) Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.Ca
 	return out, nil
 }
 
+func (c *hubClient) RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterAgentResponse)
+	err := c.cc.Invoke(ctx, Hub_RegisterAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HubServer is the server API for Hub service.
 // All implementations must embed UnimplementedHubServer
 // for forward compatibility.
 type HubServer interface {
 	Ping(context.Context, *emptypb.Empty) (*PongResponse, error)
+	RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error)
 	mustEmbedUnimplementedHubServer()
 }
 
@@ -65,6 +78,9 @@ type UnimplementedHubServer struct{}
 
 func (UnimplementedHubServer) Ping(context.Context, *emptypb.Empty) (*PongResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedHubServer) RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterAgent not implemented")
 }
 func (UnimplementedHubServer) mustEmbedUnimplementedHubServer() {}
 func (UnimplementedHubServer) testEmbeddedByValue()             {}
@@ -105,6 +121,24 @@ func _Hub_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Hub_RegisterAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HubServer).RegisterAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Hub_RegisterAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HubServer).RegisterAgent(ctx, req.(*RegisterAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Hub_ServiceDesc is the grpc.ServiceDesc for Hub service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,6 +149,10 @@ var Hub_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _Hub_Ping_Handler,
+		},
+		{
+			MethodName: "RegisterAgent",
+			Handler:    _Hub_RegisterAgent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

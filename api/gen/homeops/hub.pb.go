@@ -66,15 +66,145 @@ func (x *PongResponse) GetPong() string {
 	return ""
 }
 
+type RegisterAgentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	Arch          string                 `protobuf:"bytes,5,opt,name=arch,proto3" json:"arch,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterAgentRequest) Reset() {
+	*x = RegisterAgentRequest{}
+	mi := &file_homeops_hub_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterAgentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterAgentRequest) ProtoMessage() {}
+
+func (x *RegisterAgentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterAgentRequest.ProtoReflect.Descriptor instead.
+func (*RegisterAgentRequest) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RegisterAgentRequest) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
+	}
+	return ""
+}
+
+func (x *RegisterAgentRequest) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
+}
+
+func (x *RegisterAgentRequest) GetHostname() string {
+	if x != nil {
+		return x.Hostname
+	}
+	return ""
+}
+
+func (x *RegisterAgentRequest) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *RegisterAgentRequest) GetArch() string {
+	if x != nil {
+		return x.Arch
+	}
+	return ""
+}
+
+type RegisterAgentResponse struct {
+	state                   protoimpl.MessageState `protogen:"open.v1"`
+	HeartbeatIntervalSecond int64                  `protobuf:"varint,1,opt,name=heartbeat_interval_second,json=heartbeatIntervalSecond,proto3" json:"heartbeat_interval_second,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
+}
+
+func (x *RegisterAgentResponse) Reset() {
+	*x = RegisterAgentResponse{}
+	mi := &file_homeops_hub_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterAgentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterAgentResponse) ProtoMessage() {}
+
+func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterAgentResponse.ProtoReflect.Descriptor instead.
+func (*RegisterAgentResponse) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RegisterAgentResponse) GetHeartbeatIntervalSecond() int64 {
+	if x != nil {
+		return x.HeartbeatIntervalSecond
+	}
+	return 0
+}
+
 var File_homeops_hub_proto protoreflect.FileDescriptor
 
 const file_homeops_hub_proto_rawDesc = "" +
 	"\n" +
 	"\x11homeops/hub.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
 	"\fPongResponse\x12\x12\n" +
-	"\x04pong\x18\x01 \x01(\tR\x04pong26\n" +
+	"\x04pong\x18\x01 \x01(\tR\x04pong\"\x9a\x01\n" +
+	"\x14RegisterAgentRequest\x12\x19\n" +
+	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1a\n" +
+	"\bhostname\x18\x03 \x01(\tR\bhostname\x12\x18\n" +
+	"\aversion\x18\x04 \x01(\tR\aversion\x12\x12\n" +
+	"\x04arch\x18\x05 \x01(\tR\x04arch\"S\n" +
+	"\x15RegisterAgentResponse\x12:\n" +
+	"\x19heartbeat_interval_second\x18\x01 \x01(\x03R\x17heartbeatIntervalSecond2x\n" +
 	"\x03Hub\x12/\n" +
-	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PongResponse\"\x00B<Z:github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeopsb\x06proto3"
+	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PongResponse\"\x00\x12@\n" +
+	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\"\x00B<Z:github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeopsb\x06proto3"
 
 var (
 	file_homeops_hub_proto_rawDescOnce sync.Once
@@ -88,16 +218,20 @@ func file_homeops_hub_proto_rawDescGZIP() []byte {
 	return file_homeops_hub_proto_rawDescData
 }
 
-var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_homeops_hub_proto_goTypes = []any{
-	(*PongResponse)(nil),  // 0: PongResponse
-	(*emptypb.Empty)(nil), // 1: google.protobuf.Empty
+	(*PongResponse)(nil),          // 0: PongResponse
+	(*RegisterAgentRequest)(nil),  // 1: RegisterAgentRequest
+	(*RegisterAgentResponse)(nil), // 2: RegisterAgentResponse
+	(*emptypb.Empty)(nil),         // 3: google.protobuf.Empty
 }
 var file_homeops_hub_proto_depIdxs = []int32{
-	1, // 0: Hub.Ping:input_type -> google.protobuf.Empty
-	0, // 1: Hub.Ping:output_type -> PongResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	3, // 0: Hub.Ping:input_type -> google.protobuf.Empty
+	1, // 1: Hub.RegisterAgent:input_type -> RegisterAgentRequest
+	0, // 2: Hub.Ping:output_type -> PongResponse
+	2, // 3: Hub.RegisterAgent:output_type -> RegisterAgentResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -114,7 +248,7 @@ func file_homeops_hub_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_homeops_hub_proto_rawDesc), len(file_homeops_hub_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
