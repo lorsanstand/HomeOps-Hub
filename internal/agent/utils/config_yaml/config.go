@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rs/zerolog"
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,6 +14,7 @@ type AgentConfig struct {
 		Host string `yaml:"host"`
 		Port int    `yaml:"port"`
 	} `yaml:"hub"`
+	LogLevel string `yaml:"log_level"`
 }
 
 func NewConfig() (*AgentConfig, error) {
@@ -28,4 +30,20 @@ func NewConfig() (*AgentConfig, error) {
 	}
 
 	return &cfg, nil
+}
+
+func (c *AgentConfig) GetLogLevel() zerolog.Level {
+	level, err := zerolog.ParseLevel(c.LogLevel)
+	if err != nil {
+		return zerolog.InfoLevel
+	}
+	return level
+}
+
+func (c *AgentConfig) GetMode() string {
+	return "PROD"
+}
+
+func (c *AgentConfig) GetGRPCAddress() string {
+	return fmt.Sprintf("%v:%v", c.HubConnect.Host, c.HubConnect.Port)
 }

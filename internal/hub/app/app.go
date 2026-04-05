@@ -2,10 +2,11 @@ package app
 
 import (
 	"fmt"
+	standartlog "log"
 	"net"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
-	grpcserv "github.com/lorsanstand/HomeOps-Hub/internal/hub/grpc"
+	grpcserv "github.com/lorsanstand/HomeOps-Hub/internal/hub/rpc"
 	"github.com/lorsanstand/HomeOps-Hub/internal/shared/config"
 	"github.com/lorsanstand/HomeOps-Hub/internal/shared/log"
 	"github.com/rs/zerolog"
@@ -20,7 +21,7 @@ type App struct {
 func NewApp() *App {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		fmt.Errorf("failed get config: %v", err)
+		standartlog.Fatalf("failed get config: %v", err)
 	}
 
 	logger := log.NewLogger(cfg)
@@ -44,7 +45,7 @@ func (a *App) Run() {
 
 	err = grpcServer.Serve(lis)
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed started grpc server")
+		a.log.Error().Err(err).Msg("failed started rpc server")
 		return
 	}
 
