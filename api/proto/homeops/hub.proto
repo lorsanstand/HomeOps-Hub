@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeops";
+
+service Hub {
+  rpc Ping (google.protobuf.Empty) returns (PongResponse) {}
+  rpc RegisterAgent (RegisterAgentRequest) returns (RegisterAgentResponse) {}
+}
+
+message PongResponse {
+  string pong = 1;
+}
+
+message RegisterAgentRequest {
+  string agent_id = 1;
+  string agent_name = 2;
+  string hostname = 3;
+  string version = 4;
+  string arch = 5;
+  AgentConfig config = 6;
+}
+
+message AgentConfig {
+  string system = 1;
+  bool docker = 2;
+}
+
+message RegisterAgentResponse {
+  int64 heartbeat_interval_second = 1;
+}
