@@ -73,6 +73,7 @@ type RegisterAgentRequest struct {
 	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
 	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	Arch          string                 `protobuf:"bytes,5,opt,name=arch,proto3" json:"arch,omitempty"`
+	Config        *AgentConfig           `protobuf:"bytes,6,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -142,6 +143,65 @@ func (x *RegisterAgentRequest) GetArch() string {
 	return ""
 }
 
+func (x *RegisterAgentRequest) GetConfig() *AgentConfig {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type AgentConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	System        string                 `protobuf:"bytes,1,opt,name=system,proto3" json:"system,omitempty"`
+	Docker        bool                   `protobuf:"varint,2,opt,name=docker,proto3" json:"docker,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentConfig) Reset() {
+	*x = AgentConfig{}
+	mi := &file_homeops_hub_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentConfig) ProtoMessage() {}
+
+func (x *AgentConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentConfig.ProtoReflect.Descriptor instead.
+func (*AgentConfig) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AgentConfig) GetSystem() string {
+	if x != nil {
+		return x.System
+	}
+	return ""
+}
+
+func (x *AgentConfig) GetDocker() bool {
+	if x != nil {
+		return x.Docker
+	}
+	return false
+}
+
 type RegisterAgentResponse struct {
 	state                   protoimpl.MessageState `protogen:"open.v1"`
 	HeartbeatIntervalSecond int64                  `protobuf:"varint,1,opt,name=heartbeat_interval_second,json=heartbeatIntervalSecond,proto3" json:"heartbeat_interval_second,omitempty"`
@@ -151,7 +211,7 @@ type RegisterAgentResponse struct {
 
 func (x *RegisterAgentResponse) Reset() {
 	*x = RegisterAgentResponse{}
-	mi := &file_homeops_hub_proto_msgTypes[2]
+	mi := &file_homeops_hub_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -163,7 +223,7 @@ func (x *RegisterAgentResponse) String() string {
 func (*RegisterAgentResponse) ProtoMessage() {}
 
 func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_homeops_hub_proto_msgTypes[2]
+	mi := &file_homeops_hub_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -176,7 +236,7 @@ func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterAgentResponse.ProtoReflect.Descriptor instead.
 func (*RegisterAgentResponse) Descriptor() ([]byte, []int) {
-	return file_homeops_hub_proto_rawDescGZIP(), []int{2}
+	return file_homeops_hub_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RegisterAgentResponse) GetHeartbeatIntervalSecond() int64 {
@@ -192,14 +252,18 @@ const file_homeops_hub_proto_rawDesc = "" +
 	"\n" +
 	"\x11homeops/hub.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
 	"\fPongResponse\x12\x12\n" +
-	"\x04pong\x18\x01 \x01(\tR\x04pong\"\x9a\x01\n" +
+	"\x04pong\x18\x01 \x01(\tR\x04pong\"\xc0\x01\n" +
 	"\x14RegisterAgentRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1a\n" +
 	"\bhostname\x18\x03 \x01(\tR\bhostname\x12\x18\n" +
 	"\aversion\x18\x04 \x01(\tR\aversion\x12\x12\n" +
-	"\x04arch\x18\x05 \x01(\tR\x04arch\"S\n" +
+	"\x04arch\x18\x05 \x01(\tR\x04arch\x12$\n" +
+	"\x06config\x18\x06 \x01(\v2\f.AgentConfigR\x06config\"=\n" +
+	"\vAgentConfig\x12\x16\n" +
+	"\x06system\x18\x01 \x01(\tR\x06system\x12\x16\n" +
+	"\x06docker\x18\x02 \x01(\bR\x06docker\"S\n" +
 	"\x15RegisterAgentResponse\x12:\n" +
 	"\x19heartbeat_interval_second\x18\x01 \x01(\x03R\x17heartbeatIntervalSecond2x\n" +
 	"\x03Hub\x12/\n" +
@@ -218,23 +282,25 @@ func file_homeops_hub_proto_rawDescGZIP() []byte {
 	return file_homeops_hub_proto_rawDescData
 }
 
-var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_homeops_hub_proto_goTypes = []any{
 	(*PongResponse)(nil),          // 0: PongResponse
 	(*RegisterAgentRequest)(nil),  // 1: RegisterAgentRequest
-	(*RegisterAgentResponse)(nil), // 2: RegisterAgentResponse
-	(*emptypb.Empty)(nil),         // 3: google.protobuf.Empty
+	(*AgentConfig)(nil),           // 2: AgentConfig
+	(*RegisterAgentResponse)(nil), // 3: RegisterAgentResponse
+	(*emptypb.Empty)(nil),         // 4: google.protobuf.Empty
 }
 var file_homeops_hub_proto_depIdxs = []int32{
-	3, // 0: Hub.Ping:input_type -> google.protobuf.Empty
-	1, // 1: Hub.RegisterAgent:input_type -> RegisterAgentRequest
-	0, // 2: Hub.Ping:output_type -> PongResponse
-	2, // 3: Hub.RegisterAgent:output_type -> RegisterAgentResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: RegisterAgentRequest.config:type_name -> AgentConfig
+	4, // 1: Hub.Ping:input_type -> google.protobuf.Empty
+	1, // 2: Hub.RegisterAgent:input_type -> RegisterAgentRequest
+	0, // 3: Hub.Ping:output_type -> PongResponse
+	3, // 4: Hub.RegisterAgent:output_type -> RegisterAgentResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_homeops_hub_proto_init() }
@@ -248,7 +314,7 @@ func file_homeops_hub_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_homeops_hub_proto_rawDesc), len(file_homeops_hub_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

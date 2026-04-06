@@ -5,17 +5,16 @@ import (
 	standartlog "log"
 	"net"
 
-	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 	grpcserv "github.com/lorsanstand/HomeOps-Hub/internal/hub/rpc"
 	"github.com/lorsanstand/HomeOps-Hub/internal/shared/config"
 	"github.com/lorsanstand/HomeOps-Hub/internal/shared/log"
 	"github.com/rs/zerolog"
-	"google.golang.org/grpc"
 )
 
 type App struct {
-	cfg *config.Config
-	log zerolog.Logger
+	cfg    *config.Config
+	log    zerolog.Logger
+	server *grpcserv.HubHandler
 }
 
 func NewApp() *App {
@@ -26,27 +25,31 @@ func NewApp() *App {
 
 	logger := log.NewLogger(cfg)
 
-	return &App{cfg: cfg, log: logger}
+	server := grpcserv.NewHubHandler(logger)
+
+	return &App{cfg: cfg, log: logger, server: server}
 }
 
 func (a *App) Run() {
-	address := fmt.Sprintf("http://0.0.0.0:%v", a.cfg.Port)
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", a.cfg.Port))
+	err := a.hubServe()
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed started listen")
-		return
+		a.log.Error().Err(err).Msg("failed start server")
+	}
+}
+
+func (a *App) hubServe() error {
+	address := fmt.Sprintf("0.0.0.0:%v", a.cfg.Port)
+	a.log.Info().Str("address", "http://"+address).Msg("start GRPC server")
+
+	lis, err := net.Listen("tcp", address)
+	if err != nil {
+		return err
 	}
 
-	grpcServer := grpc.NewServer()
-	pb.RegisterHubServer(grpcServer, grpcserv.NewServer())
-
-	a.log.Info().Str("address", address).Msg("server started")
-
-	err = grpcServer.Serve(lis)
+	err = a.server.GrpcServer.Serve(lis)
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed started rpc server")
-		return
+		return err
 	}
 
+	return nil
 }

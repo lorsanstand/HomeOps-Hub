@@ -34,5 +34,4 @@ func (a *App) Run() {
 	}
 
 	a.hubConn = conn
-	r
 }
