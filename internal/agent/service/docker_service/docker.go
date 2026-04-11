@@ -3,6 +3,7 @@ package docker_service
 import (
 	"context"
 
+	"github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
 	"github.com/moby/moby/api/types"
 	"github.com/moby/moby/api/types/container"
 	"github.com/rs/zerolog"
@@ -35,4 +36,13 @@ func (d *DockerService) ContainersList(ctx context.Context) ([]container.Summary
 	ContainersList, err := d.dockerClient.ContainerList(ctx, container.ListOptions{})
 	d.log.Debug().Msg("get container list")
 	return ContainersList, err
+}
+
+func (d *DockerService) Capability() domain.Capability {
+	return domain.Capability{
+		Available: true,
+		Version:   "0",
+		Name:      "docker",
+		Reason:    "",
+	}
 }

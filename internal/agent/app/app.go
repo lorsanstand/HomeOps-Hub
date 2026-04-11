@@ -27,11 +27,11 @@ func NewApp() *App {
 }
 
 func (a *App) Run() {
-	conn, err := rpc.NewConnectAgent(a.cfg.GetGRPCAddress())
-	if err != nil {
-		a.log.Error().Err(err)
-		return
-	}
-
-	a.hubConn = conn
+	//conn, err := rpc.NewConnectAgent(a.cfg.GetGRPCAddress())
+	//if err != nil {
+	//	a.log.Error().Err(err)
+	//	return
+	//}
+	//
+	//a.hubConn = conn
 }

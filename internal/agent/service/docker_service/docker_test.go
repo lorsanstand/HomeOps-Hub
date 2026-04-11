@@ -7,6 +7,7 @@ import (
 
 	"github.com/moby/moby/api/types"
 	"github.com/moby/moby/api/types/container"
+	"github.com/rs/zerolog"
 )
 
 var testError error = errors.New("test")
@@ -58,7 +59,7 @@ func TestCheckDockerDaemon(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			svc := NewDockerService(tt.mock)
+			svc := NewDockerService(tt.mock, zerolog.Logger{})
 
 			err := svc.CheckDockerDaemon(context.Background())
 			if !errors.Is(err, tt.wantErr) {
@@ -119,7 +120,7 @@ func TestContainersList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			svc := NewDockerService(tt.mock)
+			svc := NewDockerService(tt.mock, zerolog.Logger{})
 
 			got, err := svc.ContainersList(context.Background())
 			if !errors.Is(err, tt.wantErr) {
