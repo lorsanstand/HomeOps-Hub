@@ -1,9 +1,11 @@
 package rpc
 
 import (
+	"context"
 	"fmt"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
+	"github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
 	"google.golang.org/grpc"
 )
 
@@ -29,4 +31,9 @@ func (c *Connection) Close() error {
 
 func (c *Connection) Hub() pb.HubClient {
 	return c.hub
+}
+
+func (c *Connection) RegisterAgent(ctx context.Context, RegisterData domain.RegisterAgentData) (domain.RegisterAgentDataResponse, error) {
+	ResponseData, err := c.Hub().RegisterAgent(ctx, new(toAgentRegisterRequest(RegisterData)))
+	return toAgentRegisterDataResponse(ResponseData), err
 }

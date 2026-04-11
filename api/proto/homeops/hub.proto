@@ -16,17 +16,25 @@ message PongResponse {
 message RegisterAgentRequest {
   string agent_id = 1;
   string agent_name = 2;
-  AgentConfig config = 3;
+  string version = 3;
+  HostInfo host = 4;
+  repeated Capability capability = 5;
 }
 
-message AgentConfig {
+message HostInfo {
   string system = 1;
-  bool docker = 2;
-  string hostname = 3;
-  string version = 4;
-  string arch = 5;
+  string hostname = 2;
+  string arch = 3;
+}
+
+message Capability {
+  bool available = 1;
+  string version = 2;
+  string name = 3;
+  string reason = 4;
 }
 
 message RegisterAgentResponse {
   int64 heartbeat_interval_second = 1;
+  string agent_id = 2;
 }
