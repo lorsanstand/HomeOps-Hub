@@ -26,20 +26,45 @@ func (d DockerMock) ContainerList(ctx context.Context, _ container.ListOptions) 
 }
 
 func TestCheckDockerDaemon(t *testing.T) {
-	api := DockerMock{containerErr: nil, pingErr: nil, containers: []container.Summary{}}
-	docker := NewDockerService(api)
+	t.Parallel()
 
-	if err := docker.CheckDockerDaemon(context.TODO()); err != nil {
-		t.Errorf("check daemon failed: %v", err)
+	tests := []struct {
+		name    string
+		mock    DockerMock
+		wantErr error
+	}{
+		{
+			name: "success",
+			mock: DockerMock{
+				pingErr:      nil,
+				containers:   nil,
+				containerErr: nil,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "docker error",
+			mock: DockerMock{
+				pingErr:      testError,
+				containers:   nil,
+				containerErr: nil,
+			},
+			wantErr: testError,
+		},
 	}
-}
 
-func TestCheckDaemonFailed(t *testing.T) {
-	api := DockerMock{containerErr: nil, pingErr: testError, containers: []container.Summary{}}
-	docker := NewDockerService(api)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	if err := docker.CheckDockerDaemon(context.TODO()); !errors.Is(err, testError) {
-		t.Errorf("the error does not match the one originally specified: %v received: %v", testError, err)
+			svc := NewDockerService(tt.mock)
+
+			err := svc.CheckDockerDaemon(context.Background())
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("expected error %v, got: %v", tt.wantErr, err)
+			}
+		})
 	}
 }
 
@@ -76,6 +101,16 @@ func TestContainersList(t *testing.T) {
 			},
 			wantLen: 0,
 			wantErr: testError,
+		},
+		{
+			name: "docker empty container",
+			mock: DockerMock{
+				pingErr:      nil,
+				containers:   nil,
+				containerErr: nil,
+			},
+			wantLen: 0,
+			wantErr: nil,
 		},
 	}
 
