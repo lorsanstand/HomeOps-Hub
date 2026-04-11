@@ -20,7 +20,7 @@ func toAgentRegisterRequest(request domain.RegisterAgentData) pb.RegisterAgentRe
 }
 
 func toGRPCCapability(caps []domain.Capability) []*pb.Capability {
-	capability := make([]*pb.Capability, len(caps))
+	var capability []*pb.Capability
 	for _, capi := range caps {
 		capability = append(capability, &pb.Capability{
 			Name:      capi.Name,
