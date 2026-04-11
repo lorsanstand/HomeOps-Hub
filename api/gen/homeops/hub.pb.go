@@ -70,10 +70,7 @@ type RegisterAgentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	Arch          string                 `protobuf:"bytes,5,opt,name=arch,proto3" json:"arch,omitempty"`
-	Config        *AgentConfig           `protobuf:"bytes,6,opt,name=config,proto3" json:"config,omitempty"`
+	Config        *AgentConfig           `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -122,27 +119,6 @@ func (x *RegisterAgentRequest) GetAgentName() string {
 	return ""
 }
 
-func (x *RegisterAgentRequest) GetHostname() string {
-	if x != nil {
-		return x.Hostname
-	}
-	return ""
-}
-
-func (x *RegisterAgentRequest) GetVersion() string {
-	if x != nil {
-		return x.Version
-	}
-	return ""
-}
-
-func (x *RegisterAgentRequest) GetArch() string {
-	if x != nil {
-		return x.Arch
-	}
-	return ""
-}
-
 func (x *RegisterAgentRequest) GetConfig() *AgentConfig {
 	if x != nil {
 		return x.Config
@@ -154,6 +130,9 @@ type AgentConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	System        string                 `protobuf:"bytes,1,opt,name=system,proto3" json:"system,omitempty"`
 	Docker        bool                   `protobuf:"varint,2,opt,name=docker,proto3" json:"docker,omitempty"`
+	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	Arch          string                 `protobuf:"bytes,5,opt,name=arch,proto3" json:"arch,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -200,6 +179,27 @@ func (x *AgentConfig) GetDocker() bool {
 		return x.Docker
 	}
 	return false
+}
+
+func (x *AgentConfig) GetHostname() string {
+	if x != nil {
+		return x.Hostname
+	}
+	return ""
+}
+
+func (x *AgentConfig) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *AgentConfig) GetArch() string {
+	if x != nil {
+		return x.Arch
+	}
+	return ""
 }
 
 type RegisterAgentResponse struct {
@@ -252,18 +252,18 @@ const file_homeops_hub_proto_rawDesc = "" +
 	"\n" +
 	"\x11homeops/hub.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
 	"\fPongResponse\x12\x12\n" +
-	"\x04pong\x18\x01 \x01(\tR\x04pong\"\xc0\x01\n" +
+	"\x04pong\x18\x01 \x01(\tR\x04pong\"v\n" +
 	"\x14RegisterAgentRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1a\n" +
-	"\bhostname\x18\x03 \x01(\tR\bhostname\x12\x18\n" +
-	"\aversion\x18\x04 \x01(\tR\aversion\x12\x12\n" +
-	"\x04arch\x18\x05 \x01(\tR\x04arch\x12$\n" +
-	"\x06config\x18\x06 \x01(\v2\f.AgentConfigR\x06config\"=\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12$\n" +
+	"\x06config\x18\x03 \x01(\v2\f.AgentConfigR\x06config\"\x87\x01\n" +
 	"\vAgentConfig\x12\x16\n" +
 	"\x06system\x18\x01 \x01(\tR\x06system\x12\x16\n" +
-	"\x06docker\x18\x02 \x01(\bR\x06docker\"S\n" +
+	"\x06docker\x18\x02 \x01(\bR\x06docker\x12\x1a\n" +
+	"\bhostname\x18\x03 \x01(\tR\bhostname\x12\x18\n" +
+	"\aversion\x18\x04 \x01(\tR\aversion\x12\x12\n" +
+	"\x04arch\x18\x05 \x01(\tR\x04arch\"S\n" +
 	"\x15RegisterAgentResponse\x12:\n" +
 	"\x19heartbeat_interval_second\x18\x01 \x01(\x03R\x17heartbeatIntervalSecond2x\n" +
 	"\x03Hub\x12/\n" +
