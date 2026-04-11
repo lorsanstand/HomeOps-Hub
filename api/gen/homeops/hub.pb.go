@@ -70,7 +70,9 @@ type RegisterAgentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Config        *AgentConfig           `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
+	Version       string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	Host          *HostInfo              `protobuf:"bytes,4,opt,name=host,proto3" json:"host,omitempty"`
+	Capability    []*Capability          `protobuf:"bytes,5,rep,name=capability,proto3" json:"capability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -119,38 +121,50 @@ func (x *RegisterAgentRequest) GetAgentName() string {
 	return ""
 }
 
-func (x *RegisterAgentRequest) GetConfig() *AgentConfig {
+func (x *RegisterAgentRequest) GetVersion() string {
 	if x != nil {
-		return x.Config
+		return x.Version
+	}
+	return ""
+}
+
+func (x *RegisterAgentRequest) GetHost() *HostInfo {
+	if x != nil {
+		return x.Host
 	}
 	return nil
 }
 
-type AgentConfig struct {
+func (x *RegisterAgentRequest) GetCapability() []*Capability {
+	if x != nil {
+		return x.Capability
+	}
+	return nil
+}
+
+type HostInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	System        string                 `protobuf:"bytes,1,opt,name=system,proto3" json:"system,omitempty"`
-	Docker        bool                   `protobuf:"varint,2,opt,name=docker,proto3" json:"docker,omitempty"`
-	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	Arch          string                 `protobuf:"bytes,5,opt,name=arch,proto3" json:"arch,omitempty"`
+	Hostname      string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Arch          string                 `protobuf:"bytes,3,opt,name=arch,proto3" json:"arch,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AgentConfig) Reset() {
-	*x = AgentConfig{}
+func (x *HostInfo) Reset() {
+	*x = HostInfo{}
 	mi := &file_homeops_hub_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AgentConfig) String() string {
+func (x *HostInfo) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AgentConfig) ProtoMessage() {}
+func (*HostInfo) ProtoMessage() {}
 
-func (x *AgentConfig) ProtoReflect() protoreflect.Message {
+func (x *HostInfo) ProtoReflect() protoreflect.Message {
 	mi := &file_homeops_hub_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -162,42 +176,96 @@ func (x *AgentConfig) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AgentConfig.ProtoReflect.Descriptor instead.
-func (*AgentConfig) Descriptor() ([]byte, []int) {
+// Deprecated: Use HostInfo.ProtoReflect.Descriptor instead.
+func (*HostInfo) Descriptor() ([]byte, []int) {
 	return file_homeops_hub_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *AgentConfig) GetSystem() string {
+func (x *HostInfo) GetSystem() string {
 	if x != nil {
 		return x.System
 	}
 	return ""
 }
 
-func (x *AgentConfig) GetDocker() bool {
-	if x != nil {
-		return x.Docker
-	}
-	return false
-}
-
-func (x *AgentConfig) GetHostname() string {
+func (x *HostInfo) GetHostname() string {
 	if x != nil {
 		return x.Hostname
 	}
 	return ""
 }
 
-func (x *AgentConfig) GetVersion() string {
+func (x *HostInfo) GetArch() string {
+	if x != nil {
+		return x.Arch
+	}
+	return ""
+}
+
+type Capability struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Available     bool                   `protobuf:"varint,1,opt,name=available,proto3" json:"available,omitempty"`
+	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Capability) Reset() {
+	*x = Capability{}
+	mi := &file_homeops_hub_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Capability) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Capability) ProtoMessage() {}
+
+func (x *Capability) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Capability.ProtoReflect.Descriptor instead.
+func (*Capability) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Capability) GetAvailable() bool {
+	if x != nil {
+		return x.Available
+	}
+	return false
+}
+
+func (x *Capability) GetVersion() string {
 	if x != nil {
 		return x.Version
 	}
 	return ""
 }
 
-func (x *AgentConfig) GetArch() string {
+func (x *Capability) GetName() string {
 	if x != nil {
-		return x.Arch
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Capability) GetReason() string {
+	if x != nil {
+		return x.Reason
 	}
 	return ""
 }
@@ -205,13 +273,14 @@ func (x *AgentConfig) GetArch() string {
 type RegisterAgentResponse struct {
 	state                   protoimpl.MessageState `protogen:"open.v1"`
 	HeartbeatIntervalSecond int64                  `protobuf:"varint,1,opt,name=heartbeat_interval_second,json=heartbeatIntervalSecond,proto3" json:"heartbeat_interval_second,omitempty"`
+	AgentId                 string                 `protobuf:"bytes,2,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
 
 func (x *RegisterAgentResponse) Reset() {
 	*x = RegisterAgentResponse{}
-	mi := &file_homeops_hub_proto_msgTypes[3]
+	mi := &file_homeops_hub_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -223,7 +292,7 @@ func (x *RegisterAgentResponse) String() string {
 func (*RegisterAgentResponse) ProtoMessage() {}
 
 func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_homeops_hub_proto_msgTypes[3]
+	mi := &file_homeops_hub_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -236,7 +305,7 @@ func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterAgentResponse.ProtoReflect.Descriptor instead.
 func (*RegisterAgentResponse) Descriptor() ([]byte, []int) {
-	return file_homeops_hub_proto_rawDescGZIP(), []int{3}
+	return file_homeops_hub_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RegisterAgentResponse) GetHeartbeatIntervalSecond() int64 {
@@ -246,26 +315,42 @@ func (x *RegisterAgentResponse) GetHeartbeatIntervalSecond() int64 {
 	return 0
 }
 
+func (x *RegisterAgentResponse) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
+	}
+	return ""
+}
+
 var File_homeops_hub_proto protoreflect.FileDescriptor
 
 const file_homeops_hub_proto_rawDesc = "" +
 	"\n" +
 	"\x11homeops/hub.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
 	"\fPongResponse\x12\x12\n" +
-	"\x04pong\x18\x01 \x01(\tR\x04pong\"v\n" +
+	"\x04pong\x18\x01 \x01(\tR\x04pong\"\xb6\x01\n" +
 	"\x14RegisterAgentRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12$\n" +
-	"\x06config\x18\x03 \x01(\v2\f.AgentConfigR\x06config\"\x87\x01\n" +
-	"\vAgentConfig\x12\x16\n" +
-	"\x06system\x18\x01 \x01(\tR\x06system\x12\x16\n" +
-	"\x06docker\x18\x02 \x01(\bR\x06docker\x12\x1a\n" +
-	"\bhostname\x18\x03 \x01(\tR\bhostname\x12\x18\n" +
-	"\aversion\x18\x04 \x01(\tR\aversion\x12\x12\n" +
-	"\x04arch\x18\x05 \x01(\tR\x04arch\"S\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
+	"\aversion\x18\x03 \x01(\tR\aversion\x12\x1d\n" +
+	"\x04host\x18\x04 \x01(\v2\t.HostInfoR\x04host\x12+\n" +
+	"\n" +
+	"capability\x18\x05 \x03(\v2\v.CapabilityR\n" +
+	"capability\"R\n" +
+	"\bHostInfo\x12\x16\n" +
+	"\x06system\x18\x01 \x01(\tR\x06system\x12\x1a\n" +
+	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x12\n" +
+	"\x04arch\x18\x03 \x01(\tR\x04arch\"p\n" +
+	"\n" +
+	"Capability\x12\x1c\n" +
+	"\tavailable\x18\x01 \x01(\bR\tavailable\x12\x18\n" +
+	"\aversion\x18\x02 \x01(\tR\aversion\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
+	"\x06reason\x18\x04 \x01(\tR\x06reason\"n\n" +
 	"\x15RegisterAgentResponse\x12:\n" +
-	"\x19heartbeat_interval_second\x18\x01 \x01(\x03R\x17heartbeatIntervalSecond2x\n" +
+	"\x19heartbeat_interval_second\x18\x01 \x01(\x03R\x17heartbeatIntervalSecond\x12\x19\n" +
+	"\bagent_id\x18\x02 \x01(\tR\aagentId2x\n" +
 	"\x03Hub\x12/\n" +
 	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PongResponse\"\x00\x12@\n" +
 	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\"\x00B<Z:github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeopsb\x06proto3"
@@ -282,25 +367,27 @@ func file_homeops_hub_proto_rawDescGZIP() []byte {
 	return file_homeops_hub_proto_rawDescData
 }
 
-var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_homeops_hub_proto_goTypes = []any{
 	(*PongResponse)(nil),          // 0: PongResponse
 	(*RegisterAgentRequest)(nil),  // 1: RegisterAgentRequest
-	(*AgentConfig)(nil),           // 2: AgentConfig
-	(*RegisterAgentResponse)(nil), // 3: RegisterAgentResponse
-	(*emptypb.Empty)(nil),         // 4: google.protobuf.Empty
+	(*HostInfo)(nil),              // 2: HostInfo
+	(*Capability)(nil),            // 3: Capability
+	(*RegisterAgentResponse)(nil), // 4: RegisterAgentResponse
+	(*emptypb.Empty)(nil),         // 5: google.protobuf.Empty
 }
 var file_homeops_hub_proto_depIdxs = []int32{
-	2, // 0: RegisterAgentRequest.config:type_name -> AgentConfig
-	4, // 1: Hub.Ping:input_type -> google.protobuf.Empty
-	1, // 2: Hub.RegisterAgent:input_type -> RegisterAgentRequest
-	0, // 3: Hub.Ping:output_type -> PongResponse
-	3, // 4: Hub.RegisterAgent:output_type -> RegisterAgentResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: RegisterAgentRequest.host:type_name -> HostInfo
+	3, // 1: RegisterAgentRequest.capability:type_name -> Capability
+	5, // 2: Hub.Ping:input_type -> google.protobuf.Empty
+	1, // 3: Hub.RegisterAgent:input_type -> RegisterAgentRequest
+	0, // 4: Hub.Ping:output_type -> PongResponse
+	4, // 5: Hub.RegisterAgent:output_type -> RegisterAgentResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_homeops_hub_proto_init() }
@@ -314,7 +401,7 @@ func file_homeops_hub_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_homeops_hub_proto_rawDesc), len(file_homeops_hub_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
