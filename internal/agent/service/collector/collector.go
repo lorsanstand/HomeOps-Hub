@@ -1,31 +1,26 @@
 package collector
 
 import (
-	"context"
 	"os"
 	"runtime"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
 	"github.com/rs/zerolog"
 )
 
 type Docker interface {
-	Ping(ctx context.Context) (types.Ping, error)
-	ContainerList(ctx context.Context, opts container.ListOptions) ([]container.Summary, error)
 	Capability() domain.Capability
 }
 
 type Collector struct {
-	log    zerolog.Logger
-	docker Docker
+	log          zerolog.Logger
+	dockerReader Docker
 }
 
 func NewCollector(docker Docker, logger zerolog.Logger) *Collector {
 	logger = logger.With().Str("component", "agent.service.collector").Logger()
 
-	return &Collector{log: logger, docker: docker}
+	return &Collector{log: logger, dockerReader: docker}
 }
 
 func (c *Collector) GatherInfoSystem() (domain.HostInfo, []domain.Capability) {
@@ -40,6 +35,6 @@ func (c *Collector) GatherInfoSystem() (domain.HostInfo, []domain.Capability) {
 	host.Arch = runtime.GOARCH
 	host.System = runtime.GOOS
 
-	caps := []domain.Capability{c.docker.Capability()}
+	caps := []domain.Capability{c.dockerReader.Capability()}
 	return host, caps
 }
