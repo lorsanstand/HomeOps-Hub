@@ -14,7 +14,8 @@ type AgentConfig struct {
 		Host string `yaml:"host"`
 		Port int    `yaml:"port"`
 	} `yaml:"hub"`
-	LogLevel string `yaml:"log_level"`
+	LogLevel     string `yaml:"log_level"`
+	SettingsPath string `yaml:"settings_path"`
 }
 
 func NewConfig() (*AgentConfig, error) {

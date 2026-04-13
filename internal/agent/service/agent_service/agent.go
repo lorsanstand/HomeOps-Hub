@@ -6,6 +6,7 @@ import (
 
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/utils/config_yaml"
+	"github.com/lorsanstand/HomeOps-Hub/internal/agent/utils/settings"
 	"github.com/rs/zerolog"
 )
 
@@ -23,24 +24,24 @@ type AgentService struct {
 	log       zerolog.Logger
 	cfg       *config_yaml.AgentConfig
 	heartBeat int
-	agentID   string
+	settings  *settings.Settings
 }
 
 func NewAgentService(
 	collector Collector,
 	conn HubConnection,
-	AgentID string,
+	settings *settings.Settings,
 	cfg *config_yaml.AgentConfig,
 	logger zerolog.Logger,
 ) *AgentService {
 	logger = logger.With().Str("component", "agent.service.agent_serivce").Logger()
 
-	return &AgentService{collect: collector, conn: conn, cfg: cfg, log: logger, agentID: AgentID}
+	return &AgentService{collect: collector, conn: conn, cfg: cfg, log: logger, settings: settings}
 }
 
 func (a *AgentService) RegisterAgentConn(ctx context.Context) {
 	info, caps := a.collect.GatherInfoSystem()
-	AgentID := a.agentID
+	AgentID := a.settings.AgentID
 	AgentName := a.cfg.AppName
 	AgentData := domain.RegisterAgentData{AgentId: AgentID, AgentName: AgentName, Host: info, Capabilities: caps}
 
@@ -48,6 +49,10 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) {
 	if err != nil {
 		a.log.Error().Err(err).Msg("failed register agent")
 		return
+	}
+
+	if err = a.settings.Insert(settings.Settings{AgentID: data.AgentID}); err != nil {
+		a.log.Warn().Err(err).Msg("failed to save agent id")
 	}
 	fmt.Println(data)
 }

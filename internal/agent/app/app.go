@@ -10,6 +10,7 @@ import (
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/service/collector"
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/service/docker_service"
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/utils/config_yaml"
+	"github.com/lorsanstand/HomeOps-Hub/internal/agent/utils/settings"
 	log2 "github.com/lorsanstand/HomeOps-Hub/internal/shared/log"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -17,21 +18,30 @@ import (
 )
 
 type App struct {
-	log     zerolog.Logger
-	cfg     *config_yaml.AgentConfig
-	hubConn *rpc.Connection
+	log      zerolog.Logger
+	cfg      *config_yaml.AgentConfig
+	settings *settings.Settings
+	hubConn  *rpc.Connection
 }
 
-func NewApp() *App {
+func NewApp() (*App, error) {
 
 	cfg, err := config_yaml.NewConfig()
 	if err != nil {
-		standartlog.Fatalf("failed get config: %v", err)
+		standartlog.Fatalf("failed to get config: %v", err)
+		return nil, err
 	}
 
 	log := log2.NewLogger(cfg)
+	log = log.With().Str("component", "agent.app").Logger()
 
-	return &App{cfg: cfg, log: log}
+	sett, err := settings.ReadSettings(cfg.SettingsPath)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to get settings")
+		return nil, err
+	}
+
+	return &App{cfg: cfg, log: log, settings: sett}, nil
 }
 
 func (a *App) Run() {
@@ -58,6 +68,6 @@ func (a *App) Run() {
 
 	collect := collector.NewCollector(DockerService, a.log)
 
-	agent := agent_service.NewAgentService(collect, conn, "", a.cfg, a.log)
+	agent := agent_service.NewAgentService(collect, conn, a.settings, a.cfg, a.log)
 	agent.RegisterAgentConn(ctx)
 }
