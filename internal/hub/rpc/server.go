@@ -30,3 +30,7 @@ func (h *HubHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*pb.PongRespon
 	h.log.Info().Msg("pong request")
 	return &pb.PongResponse{Pong: "Pong"}, nil
 }
+
+func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgentRequest) (*pb.RegisterAgentResponse, error) {
+	return &pb.RegisterAgentResponse{AgentId: "12234", HeartbeatIntervalSecond: 2}, nil
+}

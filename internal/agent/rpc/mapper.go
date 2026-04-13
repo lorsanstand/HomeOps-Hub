@@ -33,6 +33,10 @@ func toGRPCCapability(caps []domain.Capability) []*pb.Capability {
 }
 
 func toAgentRegisterDataResponse(response *pb.RegisterAgentResponse) domain.RegisterAgentDataResponse {
+	if response == nil {
+		return domain.RegisterAgentDataResponse{}
+	}
+
 	return domain.RegisterAgentDataResponse{
 		AgentID:   response.AgentId,
 		Heartbeat: int(response.HeartbeatIntervalSecond),

@@ -18,7 +18,7 @@ type AgentConfig struct {
 }
 
 func NewConfig() (*AgentConfig, error) {
-	yamlFile, err := os.ReadFile("config.yaml")
+	yamlFile, err := os.ReadFile("agent.dev.yaml")
 	if err != nil {
 		return nil, fmt.Errorf("failed open file: %v", err)
 	}
@@ -41,7 +41,7 @@ func (c *AgentConfig) GetLogLevel() zerolog.Level {
 }
 
 func (c *AgentConfig) GetMode() string {
-	return "PROD"
+	return "DEV"
 }
 
 func (c *AgentConfig) GetGRPCAddress() string {
