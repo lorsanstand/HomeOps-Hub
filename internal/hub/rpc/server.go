@@ -2,8 +2,10 @@ package rpc
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
+	"github.com/lorsanstand/HomeOps-Hub/internal/domain"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -32,5 +34,7 @@ func (h *HubHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*pb.PongRespon
 }
 
 func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgentRequest) (*pb.RegisterAgentResponse, error) {
-	return &pb.RegisterAgentResponse{AgentId: "12234", HeartbeatIntervalSecond: 2}, nil
+	data := domain.ToDomainAgentRequest(request)
+	fmt.Println(data)
+	return &pb.RegisterAgentResponse{}, nil
 }

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/utils/config_yaml"
 	"github.com/lorsanstand/HomeOps-Hub/internal/agent/utils/settings"
+	"github.com/lorsanstand/HomeOps-Hub/internal/domain"
 	"github.com/rs/zerolog"
 )
 
@@ -15,7 +15,7 @@ type Collector interface {
 }
 
 type HubConnection interface {
-	RegisterAgent(ctx context.Context, RegisterData domain.RegisterAgentData) (domain.RegisterAgentDataResponse, error)
+	RegisterAgent(ctx context.Context, RegisterData domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error)
 }
 
 type AgentService struct {
@@ -43,7 +43,7 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) {
 	info, caps := a.collect.GatherInfoSystem()
 	AgentID := a.settings.AgentID
 	AgentName := a.cfg.AppName
-	AgentData := domain.RegisterAgentData{AgentId: AgentID, AgentName: AgentName, Host: info, Capabilities: caps}
+	AgentData := domain.RegisterAgentRequest{AgentId: AgentID, AgentName: AgentName, Host: info, Capabilities: caps}
 
 	data, err := a.conn.RegisterAgent(ctx, AgentData)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
+	"github.com/lorsanstand/HomeOps-Hub/internal/domain"
 	"github.com/rs/zerolog"
 )
 

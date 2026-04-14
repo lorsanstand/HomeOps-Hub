@@ -33,7 +33,7 @@ func NewApp() *App {
 func (a *App) Run() {
 	err := a.hubServe()
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed start server")
+		a.log.Error().Err(err).Msg("failed to start the server")
 	}
 }
 
