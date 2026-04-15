@@ -30,31 +30,29 @@ func ReadSettings(path string) (*Settings, error) {
 		err = nil
 	}
 
-	file, err := os.Create(path + "/settings.json")
-	if err != nil {
-		if !errors.Is(err, os.ErrExist) {
-			return nil, err
-		}
-		err = nil
-	}
-	defer file.Close()
-
+	settingsPath := filepath.Join(path, "settings.json")
 	var settings Settings
 
-	err = json.NewDecoder(file).Decode(&settings)
+	file, err := os.Open(settingsPath)
 	if err != nil {
-		if !errors.Is(err, io.EOF) {
+		if !errors.Is(err, os.ErrNotExist) {
+			return nil, err
+		}
+	} else {
+		defer file.Close()
+		err = json.NewDecoder(file).Decode(&settings)
+		if err != nil && !errors.Is(err, io.EOF) {
 			return nil, err
 		}
 	}
 
-	settings.path = path + "/settings.json"
+	settings.path = settingsPath
 
 	return &settings, nil
 }
 
 func (s *Settings) Insert(sett Settings) error {
-	file, err := os.OpenFile(s.path, os.O_RDWR, 0755)
+	file, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}

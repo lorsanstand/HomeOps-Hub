@@ -4,12 +4,12 @@ import (
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 )
 
-func ToDomainAgentRequest(request *pb.RegisterAgentRequest) RegisterAgentData {
+func ToDomainAgentRequest(request *pb.RegisterAgentRequest) RegisterAgentRequest {
 	if request == nil {
-		return RegisterAgentData{}
+		return RegisterAgentRequest{}
 	}
 
-	return RegisterAgentData{
+	return RegisterAgentRequest{
 		AgentId:   request.AgentId,
 		AgentName: request.AgentName,
 		Host: HostInfo{
@@ -21,12 +21,12 @@ func ToDomainAgentRequest(request *pb.RegisterAgentRequest) RegisterAgentData {
 	}
 }
 
-func ToDomainAgentResponse(response *pb.RegisterAgentResponse) RegisterAgentDataResponse {
+func ToDomainAgentResponse(response *pb.RegisterAgentResponse) RegisterAgentResponse {
 	if response == nil {
-		return RegisterAgentDataResponse{}
+		return RegisterAgentResponse{}
 	}
 
-	return RegisterAgentDataResponse{
+	return RegisterAgentResponse{
 		AgentID:   response.AgentId,
 		Heartbeat: int(response.HeartbeatIntervalSecond),
 	}
@@ -51,7 +51,7 @@ func ToDomainCapabilities(capability []*pb.Capability) []Capability {
 	return caps
 }
 
-func ToGRPCAgentRequest(request RegisterAgentData) pb.RegisterAgentRequest {
+func ToGRPCAgentRequest(request RegisterAgentRequest) pb.RegisterAgentRequest {
 	return pb.RegisterAgentRequest{
 		AgentId:   request.AgentId,
 		AgentName: request.AgentName,
@@ -63,6 +63,10 @@ func ToGRPCAgentRequest(request RegisterAgentData) pb.RegisterAgentRequest {
 		Version:    request.AgentVersion,
 		Capability: ToGRPCCapability(request.Capabilities),
 	}
+}
+
+func ToGRPCAgentResponse(response RegisterAgentResponse) *pb.RegisterAgentResponse {
+	return &pb.RegisterAgentResponse{AgentId: response.AgentID, HeartbeatIntervalSecond: int64(response.Heartbeat)}
 }
 
 func ToGRPCCapability(caps []Capability) []*pb.Capability {

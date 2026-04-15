@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 	"github.com/lorsanstand/HomeOps-Hub/internal/domain"
@@ -11,14 +10,19 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+type HubService interface {
+	RegisterAgent(data domain.RegisterAgentRequest) domain.RegisterAgentResponse
+}
+
 type HubHandler struct {
 	pb.UnimplementedHubServer
 	log        zerolog.Logger
 	GrpcServer *grpc.Server
+	hub        HubService
 }
 
-func NewHubHandler(logger zerolog.Logger) *HubHandler {
-	hub := &HubHandler{log: logger}
+func NewHubHandler(HubServ HubService, logger zerolog.Logger) *HubHandler {
+	hub := &HubHandler{log: logger, hub: HubServ}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterHubServer(grpcServer, hub)
@@ -35,6 +39,6 @@ func (h *HubHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*pb.PongRespon
 
 func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgentRequest) (*pb.RegisterAgentResponse, error) {
 	data := domain.ToDomainAgentRequest(request)
-	fmt.Println(data)
-	return &pb.RegisterAgentResponse{}, nil
+	resp := h.hub.RegisterAgent(data)
+	return domain.ToGRPCAgentResponse(resp), nil
 }
