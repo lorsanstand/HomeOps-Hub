@@ -1,10 +1,13 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	standartlog "log"
 	"net"
 
+	hubdir "github.com/lorsanstand/HomeOps-Hub/internal/hub"
+	"github.com/lorsanstand/HomeOps-Hub/internal/hub/migrator"
 	grpcserv "github.com/lorsanstand/HomeOps-Hub/internal/hub/rpc"
 	"github.com/lorsanstand/HomeOps-Hub/internal/hub/service/hub_service"
 	"github.com/lorsanstand/HomeOps-Hub/internal/shared/config"
@@ -29,9 +32,28 @@ func NewApp() *App {
 }
 
 func (a *App) Run() {
-	err := a.hubServe()
+	migratePGConn, err := sql.Open("pgx", a.cfg.GetURLPostgres())
+	if err != nil {
+		a.log.Error().Err(err).Msg("failed to connect to the database")
+		return
+	}
+	defer migratePGConn.Close()
+
+	mgrt, err := migrator.NewMigrator(hubdir.MigrationsFS, "migrations")
+	if err != nil {
+		a.log.Error().Err(err).Msg("failed create migrator")
+		return
+	}
+
+	if err = mgrt.ApplyMigrations(migratePGConn); err != nil {
+		a.log.Error().Err(err).Msg("migrations were not applied")
+	}
+	migratePGConn.Close()
+
+	err = a.hubServe()
 	if err != nil {
 		a.log.Error().Err(err).Msg("failed to start the server")
+		return
 	}
 }
 
