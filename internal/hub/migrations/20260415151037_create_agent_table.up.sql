@@ -1,5 +1,5 @@
 CREATE TABLE agents (
-    id BIGINT UNIQUE PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     agent_id VARCHAR(32) UNIQUE NOT NULL,
     agent_name VARCHAR(255),
     architecture VARCHAR(10) NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE agents (
     registered_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_agent_id ON agent (id);
-CREATE UNIQUE INDEX idx_agent_id_id On agent (agent_id)
+CREATE UNIQUE INDEX idx_agent_id ON agents (id);
+CREATE UNIQUE INDEX idx_agent_id_id On agents (agent_id)

@@ -11,7 +11,7 @@ import (
 )
 
 type HubService interface {
-	RegisterAgent(data domain.RegisterAgentRequest) domain.RegisterAgentResponse
+	RegisterAgent(ctx context.Context, data domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error)
 }
 
 type HubHandler struct {
@@ -39,6 +39,6 @@ func (h *HubHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*pb.PongRespon
 
 func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgentRequest) (*pb.RegisterAgentResponse, error) {
 	data := domain.ToDomainAgentRequest(request)
-	resp := h.hub.RegisterAgent(data)
-	return domain.ToGRPCAgentResponse(resp), nil
+	resp, err := h.hub.RegisterAgent(ctx, data)
+	return domain.ToGRPCAgentResponse(resp), err
 }

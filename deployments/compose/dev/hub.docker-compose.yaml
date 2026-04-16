@@ -1,0 +1,24 @@
+services:
+  postgres-db:
+    image: postgres:latest
+    volumes:
+      - pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASS}"
+    networks:
+      - homeops-dev
+    ports:
+      - "${DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  pgdata:
+
+networks:
+  homeops-dev:
