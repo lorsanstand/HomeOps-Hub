@@ -10,6 +10,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+const AgentVersion = "0.0"
+
 type Collector interface {
 	GatherInfoSystem() (domain.HostInfo, []domain.Capability)
 }
@@ -43,7 +45,7 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) {
 	info, caps := a.collect.GatherInfoSystem()
 	AgentID := a.settings.AgentID
 	AgentName := a.cfg.AppName
-	AgentData := domain.RegisterAgentRequest{AgentId: AgentID, AgentName: AgentName, Host: info, Capabilities: caps}
+	AgentData := domain.RegisterAgentRequest{AgentId: AgentID, AgentName: AgentName, Host: info, Capabilities: caps, AgentVersion: AgentVersion}
 
 	data, err := a.conn.RegisterAgent(ctx, AgentData)
 	if err != nil {

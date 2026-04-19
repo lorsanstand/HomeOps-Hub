@@ -9,7 +9,7 @@ import (
 )
 
 type Agent struct {
-	ID           int64
+	ID           int32
 	AgentID      string
 	AgentName    *string
 	Architecture string
