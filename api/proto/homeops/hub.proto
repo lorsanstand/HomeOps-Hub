@@ -7,6 +7,7 @@ option go_package = "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeops"
 service Hub {
   rpc Ping (google.protobuf.Empty) returns (PongResponse) {}
   rpc RegisterAgent (RegisterAgentRequest) returns (RegisterAgentResponse) {}
+  rpc StreamConnection (stream AgentEvent) returns (stream ServerCommandRequest) {}
 }
 
 message PongResponse {
@@ -37,4 +38,47 @@ message Capability {
 message RegisterAgentResponse {
   int64 heartbeat_interval_second = 1;
   string agent_id = 2;
+}
+
+message ServerCommandRequest {
+  string request_id = 1;
+  string name = 2;
+  map<string, string> args = 3;
+  int64 timeout_seconds = 4;
+}
+
+message AgentEvent {
+  string agent_id = 1;
+
+  oneof event {
+    Heartbeat heartbeat = 2;
+    CommandResponse command_response = 3;
+    Alert alert = 4;
+  }
+}
+
+message Heartbeat {
+  int64 timestamp = 1;
+  SystemMetrics metrics = 2;
+}
+
+message SystemMetrics {
+  float cpu_usage = 1;
+  float memory_usage = 2;
+  float disk_usage = 3;
+}
+
+message CommandResponse {
+  string request_id = 1;
+  bool success = 2;
+  string output = 3;
+  string error = 4;
+  int64 exec_time_ms = 5;
+}
+
+message Alert {
+  int64 timestamp = 1;
+  string level = 2;
+  string title = 3;
+  string description = 4;
 }

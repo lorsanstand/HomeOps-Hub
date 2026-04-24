@@ -20,8 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Hub_Ping_FullMethodName          = "/Hub/Ping"
-	Hub_RegisterAgent_FullMethodName = "/Hub/RegisterAgent"
+	Hub_Ping_FullMethodName             = "/Hub/Ping"
+	Hub_RegisterAgent_FullMethodName    = "/Hub/RegisterAgent"
+	Hub_StreamConnection_FullMethodName = "/Hub/StreamConnection"
 )
 
 // HubClient is the client API for Hub service.
@@ -30,6 +31,7 @@ const (
 type HubClient interface {
 	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PongResponse, error)
 	RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
+	StreamConnection(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[AgentEvent, ServerCommandRequest], error)
 }
 
 type hubClient struct {
@@ -60,12 +62,26 @@ func (c *hubClient) RegisterAgent(ctx context.Context, in *RegisterAgentRequest,
 	return out, nil
 }
 
+func (c *hubClient) StreamConnection(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[AgentEvent, ServerCommandRequest], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Hub_ServiceDesc.Streams[0], Hub_StreamConnection_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[AgentEvent, ServerCommandRequest]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Hub_StreamConnectionClient = grpc.BidiStreamingClient[AgentEvent, ServerCommandRequest]
+
 // HubServer is the server API for Hub service.
 // All implementations must embed UnimplementedHubServer
 // for forward compatibility.
 type HubServer interface {
 	Ping(context.Context, *emptypb.Empty) (*PongResponse, error)
 	RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error)
+	StreamConnection(grpc.BidiStreamingServer[AgentEvent, ServerCommandRequest]) error
 	mustEmbedUnimplementedHubServer()
 }
 
@@ -81,6 +97,9 @@ func (UnimplementedHubServer) Ping(context.Context, *emptypb.Empty) (*PongRespon
 }
 func (UnimplementedHubServer) RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RegisterAgent not implemented")
+}
+func (UnimplementedHubServer) StreamConnection(grpc.BidiStreamingServer[AgentEvent, ServerCommandRequest]) error {
+	return status.Error(codes.Unimplemented, "method StreamConnection not implemented")
 }
 func (UnimplementedHubServer) mustEmbedUnimplementedHubServer() {}
 func (UnimplementedHubServer) testEmbeddedByValue()             {}
@@ -139,6 +158,13 @@ func _Hub_RegisterAgent_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Hub_StreamConnection_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(HubServer).StreamConnection(&grpc.GenericServerStream[AgentEvent, ServerCommandRequest]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Hub_StreamConnectionServer = grpc.BidiStreamingServer[AgentEvent, ServerCommandRequest]
+
 // Hub_ServiceDesc is the grpc.ServiceDesc for Hub service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -155,6 +181,13 @@ var Hub_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Hub_RegisterAgent_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamConnection",
+			Handler:       _Hub_StreamConnection_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "homeops/hub.proto",
 }
