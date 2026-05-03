@@ -1,6 +1,6 @@
 package domain
 
-type RegisterAgentData struct {
+type RegisterAgentRequest struct {
 	AgentId      string
 	AgentName    string
 	AgentVersion string
@@ -21,7 +21,7 @@ type Capability struct {
 	Reason    string
 }
 
-type RegisterAgentDataResponse struct {
+type RegisterAgentResponse struct {
 	Heartbeat int
 	AgentID   string
 }

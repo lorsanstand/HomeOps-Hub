@@ -1,6 +1,8 @@
 package docker_service
 
-import "github.com/lorsanstand/HomeOps-Hub/internal/agent/domain"
+import (
+	"github.com/lorsanstand/HomeOps-Hub/internal/domain"
+)
 
 type BadDocker struct {
 	reason string
