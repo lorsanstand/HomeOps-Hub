@@ -8,6 +8,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const MODE = "DEV"
+const AgentVersion = "0.0"
+
 type AgentConfig struct {
 	AppName    string `yaml:"app_name"`
 	HubConnect struct {
@@ -19,7 +22,7 @@ type AgentConfig struct {
 }
 
 func NewConfig() (*AgentConfig, error) {
-	yamlFile, err := os.ReadFile("agent.dev.yaml")
+	yamlFile, err := os.ReadFile("config.yaml")
 	if err != nil {
 		return nil, fmt.Errorf("failed open file: %v", err)
 	}
@@ -42,7 +45,11 @@ func (c *AgentConfig) GetLogLevel() zerolog.Level {
 }
 
 func (c *AgentConfig) GetMode() string {
-	return "DEV"
+	return MODE
+}
+
+func (c *AgentConfig) GetAgentVersion() string {
+	return AgentVersion
 }
 
 func (c *AgentConfig) GetGRPCAddress() string {

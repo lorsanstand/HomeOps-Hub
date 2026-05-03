@@ -11,7 +11,7 @@ import (
 	"github.com/lorsanstand/HomeOps-Hub/agent/internal/service/docker_service"
 	"github.com/lorsanstand/HomeOps-Hub/agent/internal/utils/config_yaml"
 	"github.com/lorsanstand/HomeOps-Hub/agent/internal/utils/settings"
-	log2 "github.com/lorsanstand/HomeOps-Hub/shared/log"
+	"github.com/lorsanstand/HomeOps-Hub/shared/log"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -31,16 +31,16 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
-	log := log2.NewLogger(cfg)
-	log = log.With().Str("component", "agent.app").Logger()
+	logger := log.NewLogger(cfg)
+	logger = logger.With().Str("component", "internal.app").Logger()
 
 	sett, err := settings.ReadSettings(cfg.SettingsPath)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get settings")
+		logger.Error().Err(err).Msg("failed to get settings")
 		return nil, err
 	}
 
-	return &App{cfg: cfg, log: log, settings: sett}, nil
+	return &App{cfg: cfg, log: logger, settings: sett}, nil
 }
 
 func (a *App) Run() {
@@ -48,11 +48,12 @@ func (a *App) Run() {
 
 	GRPCConn, err := grpc.NewClient(a.cfg.GetGRPCAddress(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed to get agent connections")
+		a.log.Error().Err(err).Msg("failed to connection hub")
 		return
 	}
+	a.log.Info().Msg("connection to the hub successful")
 
-	conn := rpc.NewConnectAgent(GRPCConn, a.log)
+	conn := rpc.NewConnectAgent(GRPCConn)
 	defer conn.Close()
 
 	var DockerService collector.Docker
@@ -62,11 +63,15 @@ func (a *App) Run() {
 		a.log.Warn().Err(err).Msg("failed to get docker API")
 		DockerService = docker_service.NewBadDocker("not_installed")
 	} else {
+		a.log.Info().Msg("successfully to get docker API")
 		DockerService = docker_service.NewDockerService(DockerClient, a.log)
 	}
 
 	collect := collector.NewCollector(DockerService, a.log)
 
 	agent := agent_service.NewAgentService(collect, conn, a.settings, a.cfg, a.log)
-	agent.RegisterAgentConn(ctx)
+	if err := agent.RegisterAgentConn(ctx); err != nil {
+		a.log.Error().Err(err).Msg("failed to agent registration")
+	}
+	a.log.Info().Msg("agent registration complete")
 }

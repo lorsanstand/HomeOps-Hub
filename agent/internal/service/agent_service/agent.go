@@ -10,8 +10,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-const AgentVersion = "0.0"
-
 type Collector interface {
 	GatherInfoSystem() (domain.HostInfo, []domain.Capability)
 }
@@ -36,25 +34,33 @@ func NewAgentService(
 	cfg *config_yaml.AgentConfig,
 	logger zerolog.Logger,
 ) *AgentService {
-	logger = logger.With().Str("component", "cmd.service.agent_serivce").Logger()
+	logger = logger.With().Str("component", "internal.service.agent_serivce").Logger()
 
 	return &AgentService{collect: collector, conn: conn, cfg: cfg, log: logger, settings: settings}
 }
 
-func (a *AgentService) RegisterAgentConn(ctx context.Context) {
+func (a *AgentService) RegisterAgentConn(ctx context.Context) error {
+	a.log.Debug().Msg("getting info by system")
 	info, caps := a.collect.GatherInfoSystem()
+	a.log.Debug().Msg("create request data for register agent")
 	AgentID := a.settings.AgentID
 	AgentName := a.cfg.AppName
-	AgentData := domain.RegisterAgentRequest{AgentId: AgentID, AgentName: AgentName, Host: info, Capabilities: caps, AgentVersion: AgentVersion}
+	AgentData := domain.RegisterAgentRequest{
+		AgentId:      AgentID,
+		AgentName:    AgentName,
+		Host:         info,
+		Capabilities: caps,
+		AgentVersion: a.cfg.GetAgentVersion(),
+	}
 
 	data, err := a.conn.RegisterAgent(ctx, AgentData)
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed register cmd")
-		return
+		return fmt.Errorf("register agent: %w", err)
 	}
 
 	if err = a.settings.Insert(settings.Settings{AgentID: data.AgentID}); err != nil {
-		a.log.Warn().Err(err).Msg("failed to save cmd id")
+		return fmt.Errorf("save agent ID: %w", err)
 	}
-	fmt.Println(data)
+
+	return nil
 }

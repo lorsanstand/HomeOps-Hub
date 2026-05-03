@@ -23,13 +23,13 @@ type DockerService struct {
 func NewDockerService(api dockerAPI, logger zerolog.Logger) *DockerService {
 	return &DockerService{
 		dockerClient: api,
-		log:          logger.With().Str("component", "cmd.serivce.docker").Logger(),
+		log:          logger.With().Str("component", "internal.serivce.docker").Logger(),
 	}
 }
 
 func (d *DockerService) CheckDockerDaemon(ctx context.Context) error {
 	_, err := d.dockerClient.Ping(ctx)
-	d.log.Debug().Msg("check docker")
+	d.log.Debug().Msg("ping docker")
 	return err
 }
 

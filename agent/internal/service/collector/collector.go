@@ -18,7 +18,7 @@ type Collector struct {
 }
 
 func NewCollector(docker Docker, logger zerolog.Logger) *Collector {
-	logger = logger.With().Str("component", "cmd.service.collector").Logger()
+	logger = logger.With().Str("component", "internal.service.collector").Logger()
 
 	return &Collector{log: logger, dockerReader: docker}
 }
