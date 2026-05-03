@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.1
-// source: homeops/hub.proto
+// source: homeops/cmd.proto
 
 package homeops
 
@@ -326,7 +326,7 @@ var File_homeops_hub_proto protoreflect.FileDescriptor
 
 const file_homeops_hub_proto_rawDesc = "" +
 	"\n" +
-	"\x11homeops/hub.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
+	"\x11homeops/cmd.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
 	"\fPongResponse\x12\x12\n" +
 	"\x04pong\x18\x01 \x01(\tR\x04pong\"\xb6\x01\n" +
 	"\x14RegisterAgentRequest\x12\x19\n" +
