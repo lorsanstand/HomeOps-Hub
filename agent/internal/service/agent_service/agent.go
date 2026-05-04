@@ -65,7 +65,7 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) error {
 	if err = a.settings.InsertAgentID(data.AgentID); err != nil {
 		return fmt.Errorf("save agent ID: %w", err)
 	}
-	a.log.Info().Str("AgentID", data.AgentID).Msg("agent registration end")
+	a.log.Info().Str("agentID", data.AgentID).Msg("agent registration end")
 
 	return nil
 }
