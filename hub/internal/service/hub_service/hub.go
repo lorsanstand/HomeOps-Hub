@@ -12,6 +12,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+const HEARTBEAT = 5
+
 type Store interface {
 	NewAgent(ctx context.Context, agent domainHub.CreateAgentModel) error
 	GetAgentByAgentID(ctx context.Context, AgentID string) (domainHub.AgentModel, error)
@@ -28,32 +30,29 @@ func NewHubService(store Store, logger zerolog.Logger) *HubService {
 }
 
 func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error) {
-	h.log.Debug().Str("agentId", data.AgentId).Str("agentName", data.AgentName).Msg("started registering agent")
+	h.log.Debug().Str("agentID", data.AgentId).Str("agentName", data.AgentName).Msg("started registering agent")
 	agent, err := h.store.GetAgentByAgentID(ctx, data.AgentId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		h.log.Error().Err(err).Str("agentId", data.AgentId).Msg("failed to get agent from database")
 		return domain.RegisterAgentResponse{}, fmt.Errorf("failed select agent to db: %w", err)
 	}
 
 	if data.AgentId != "" && !errors.Is(err, sql.ErrNoRows) {
-		h.log.Debug().Str("agentId", agent.AgentID).Str("agentName", data.AgentName).Msg("agent exists, updating")
+		h.log.Debug().Str("agentID", agent.AgentID).Str("agentName", data.AgentName).Msg("agent exists, updating")
 
 		data.AgentId = agent.AgentID
 
 		agentStore := toCreateAgentModel(data)
 
 		if err := h.store.UpdateAgentByID(ctx, agent.ID, agentStore); err != nil {
-			h.log.Error().Err(err).Str("agentId", agent.AgentID).Msg("failed to update agent in database")
-			return domain.RegisterAgentResponse{}, err
+			return domain.RegisterAgentResponse{}, fmt.Errorf("update agent in db: %w", err)
 		}
-		h.log.Info().Str("agentId", agent.AgentID).Msg("agent updated successfully")
-		return domain.RegisterAgentResponse{AgentID: agent.AgentID, Heartbeat: 5}, nil
+		h.log.Debug().Str("agentId", agent.AgentID).Msg("agent updated successfully")
+		return domain.RegisterAgentResponse{AgentID: agent.AgentID, Heartbeat: HEARTBEAT}, nil
 	}
 
 	AgentID, err := hasher.MakeID(data.Host, data.AgentName)
 	if err != nil {
-		h.log.Error().Err(err).Str("agentName", data.AgentName).Str("hostname", data.Host.Hostname).Msg("failed to generate agent id")
-		return domain.RegisterAgentResponse{}, err
+		return domain.RegisterAgentResponse{}, fmt.Errorf("generate agent ID: %w", err)
 	}
 
 	data.AgentId = AgentID
@@ -61,10 +60,7 @@ func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgen
 	agentStore := toCreateAgentModel(data)
 
 	if err := h.store.NewAgent(ctx, agentStore); err != nil {
-		h.log.Error().Err(err).Str("agentId", AgentID).Str("agentName", data.AgentName).Msg("failed to create new agent in database")
-		return domain.RegisterAgentResponse{}, err
+		return domain.RegisterAgentResponse{}, fmt.Errorf("insert new agent: %w", err)
 	}
-
-	h.log.Info().Str("agentId", AgentID).Str("agentName", data.AgentName).Str("hostname", data.Host.Hostname).Msg("agent registered successfully")
-	return domain.RegisterAgentResponse{AgentID: AgentID, Heartbeat: 5}, nil
+	return domain.RegisterAgentResponse{AgentID: AgentID, Heartbeat: HEARTBEAT}, nil
 }

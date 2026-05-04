@@ -38,13 +38,13 @@ func (h *HubHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*pb.PongRespon
 }
 
 func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgentRequest) (*pb.RegisterAgentResponse, error) {
-	h.log.Debug().Str("agentId", request.AgentId).Str("agentName", request.AgentName).Msg("register agent request received")
+	h.log.Debug().Str("agentID", request.AgentId).Str("agentName", request.AgentName).Msg("register agent request received")
 	data := domain.ToDomainAgentRequest(request)
 	resp, err := h.hub.RegisterAgent(ctx, data)
 	if err != nil {
-		h.log.Error().Err(err).Str("agentId", request.AgentId).Msg("register agent request failed")
+		h.log.Error().Err(err).Str("agentID", request.AgentId).Msg("register agent request failed")
 		return domain.ToGRPCAgentResponse(resp), err
 	}
-	h.log.Debug().Str("agentId", resp.AgentID).Msg("register agent request completed")
+	h.log.Info().Str("agentID", resp.AgentID).Msg("register agent request completed")
 	return domain.ToGRPCAgentResponse(resp), nil
 }

@@ -27,6 +27,7 @@ func NewApp() *App {
 	cfg, err := config.NewConfig()
 	if err != nil {
 		standartlog.Fatalf("failed get config: %v", err)
+		return nil
 	}
 
 	logger := log.NewLogger(cfg)
@@ -80,7 +81,6 @@ func (a *App) Run() {
 
 func (a *App) hubServe(hubService *hub_service.HubService) error {
 	address := fmt.Sprintf("0.0.0.0:%v", a.cfg.Port)
-	a.log.Info().Str("address", address).Msg("starting gRPC server")
 
 	server := grpcserv.NewHubHandler(hubService, a.log)
 
