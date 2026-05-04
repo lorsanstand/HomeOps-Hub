@@ -5,13 +5,17 @@ import (
 	"fmt"
 
 	"github.com/lorsanstand/HomeOps-Hub/agent/internal/utils/config_yaml"
-	"github.com/lorsanstand/HomeOps-Hub/agent/internal/utils/settings"
 	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
 	"github.com/rs/zerolog"
 )
 
 type Collector interface {
 	GatherInfoSystem() (domain.HostInfo, []domain.Capability)
+}
+
+type Settings interface {
+	InsertAgentID(agentID string) error
+	GetAgentID() string
 }
 
 type HubConnection interface {
@@ -24,13 +28,13 @@ type AgentService struct {
 	log       zerolog.Logger
 	cfg       *config_yaml.AgentConfig
 	heartBeat int
-	settings  *settings.Settings
+	settings  Settings
 }
 
 func NewAgentService(
 	collector Collector,
 	conn HubConnection,
-	settings *settings.Settings,
+	settings Settings,
 	cfg *config_yaml.AgentConfig,
 	logger zerolog.Logger,
 ) *AgentService {
@@ -43,7 +47,7 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) error {
 	a.log.Debug().Msg("getting info by system")
 	info, caps := a.collect.GatherInfoSystem()
 	a.log.Debug().Msg("create request data for register agent")
-	AgentID := a.settings.AgentID
+	AgentID := a.settings.GetAgentID()
 	AgentName := a.cfg.AppName
 	AgentData := domain.RegisterAgentRequest{
 		AgentId:      AgentID,
@@ -58,9 +62,10 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) error {
 		return fmt.Errorf("register agent: %w", err)
 	}
 
-	if err = a.settings.Insert(settings.Settings{AgentID: data.AgentID}); err != nil {
+	if err = a.settings.InsertAgentID(data.AgentID); err != nil {
 		return fmt.Errorf("save agent ID: %w", err)
 	}
+	a.log.Info().Str("AgentID", data.AgentID).Msg("agent registration end")
 
 	return nil
 }

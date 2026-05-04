@@ -51,16 +51,22 @@ func ReadSettings(path string) (*Settings, error) {
 	return &settings, nil
 }
 
-func (s *Settings) Insert(sett Settings) error {
+func (s *Settings) InsertAgentID(agentID string) error {
 	file, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
+	sett := Settings{AgentID: agentID}
+
 	if err = json.NewEncoder(file).Encode(sett); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Settings) GetAgentID() string {
+	return s.AgentID
 }
