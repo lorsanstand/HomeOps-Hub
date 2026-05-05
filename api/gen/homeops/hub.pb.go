@@ -322,6 +322,436 @@ func (x *RegisterAgentResponse) GetAgentId() string {
 	return ""
 }
 
+type ServerCommandRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	RequestId      string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Args           map[string]string      `protobuf:"bytes,3,rep,name=args,proto3" json:"args,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	TimeoutSeconds int64                  `protobuf:"varint,4,opt,name=timeout_seconds,json=timeoutSeconds,proto3" json:"timeout_seconds,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ServerCommandRequest) Reset() {
+	*x = ServerCommandRequest{}
+	mi := &file_homeops_hub_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerCommandRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerCommandRequest) ProtoMessage() {}
+
+func (x *ServerCommandRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerCommandRequest.ProtoReflect.Descriptor instead.
+func (*ServerCommandRequest) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ServerCommandRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *ServerCommandRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ServerCommandRequest) GetArgs() map[string]string {
+	if x != nil {
+		return x.Args
+	}
+	return nil
+}
+
+func (x *ServerCommandRequest) GetTimeoutSeconds() int64 {
+	if x != nil {
+		return x.TimeoutSeconds
+	}
+	return 0
+}
+
+type AgentEvent struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	AgentId string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	// Types that are valid to be assigned to Event:
+	//
+	//	*AgentEvent_Heartbeat
+	//	*AgentEvent_CommandResponse
+	//	*AgentEvent_Alert
+	Event         isAgentEvent_Event `protobuf_oneof:"event"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentEvent) Reset() {
+	*x = AgentEvent{}
+	mi := &file_homeops_hub_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentEvent) ProtoMessage() {}
+
+func (x *AgentEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentEvent.ProtoReflect.Descriptor instead.
+func (*AgentEvent) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *AgentEvent) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
+	}
+	return ""
+}
+
+func (x *AgentEvent) GetEvent() isAgentEvent_Event {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *AgentEvent) GetHeartbeat() *Heartbeat {
+	if x != nil {
+		if x, ok := x.Event.(*AgentEvent_Heartbeat); ok {
+			return x.Heartbeat
+		}
+	}
+	return nil
+}
+
+func (x *AgentEvent) GetCommandResponse() *CommandResponse {
+	if x != nil {
+		if x, ok := x.Event.(*AgentEvent_CommandResponse); ok {
+			return x.CommandResponse
+		}
+	}
+	return nil
+}
+
+func (x *AgentEvent) GetAlert() *Alert {
+	if x != nil {
+		if x, ok := x.Event.(*AgentEvent_Alert); ok {
+			return x.Alert
+		}
+	}
+	return nil
+}
+
+type isAgentEvent_Event interface {
+	isAgentEvent_Event()
+}
+
+type AgentEvent_Heartbeat struct {
+	Heartbeat *Heartbeat `protobuf:"bytes,2,opt,name=heartbeat,proto3,oneof"`
+}
+
+type AgentEvent_CommandResponse struct {
+	CommandResponse *CommandResponse `protobuf:"bytes,3,opt,name=command_response,json=commandResponse,proto3,oneof"`
+}
+
+type AgentEvent_Alert struct {
+	Alert *Alert `protobuf:"bytes,4,opt,name=alert,proto3,oneof"`
+}
+
+func (*AgentEvent_Heartbeat) isAgentEvent_Event() {}
+
+func (*AgentEvent_CommandResponse) isAgentEvent_Event() {}
+
+func (*AgentEvent_Alert) isAgentEvent_Event() {}
+
+type Heartbeat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp     int64                  `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Metrics       *SystemMetrics         `protobuf:"bytes,2,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Heartbeat) Reset() {
+	*x = Heartbeat{}
+	mi := &file_homeops_hub_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Heartbeat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Heartbeat) ProtoMessage() {}
+
+func (x *Heartbeat) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
+func (*Heartbeat) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Heartbeat) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *Heartbeat) GetMetrics() *SystemMetrics {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
+type SystemMetrics struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CpuUsage      float32                `protobuf:"fixed32,1,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	MemoryUsage   float32                `protobuf:"fixed32,2,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
+	DiskUsage     float32                `protobuf:"fixed32,3,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SystemMetrics) Reset() {
+	*x = SystemMetrics{}
+	mi := &file_homeops_hub_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SystemMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SystemMetrics) ProtoMessage() {}
+
+func (x *SystemMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SystemMetrics.ProtoReflect.Descriptor instead.
+func (*SystemMetrics) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SystemMetrics) GetCpuUsage() float32 {
+	if x != nil {
+		return x.CpuUsage
+	}
+	return 0
+}
+
+func (x *SystemMetrics) GetMemoryUsage() float32 {
+	if x != nil {
+		return x.MemoryUsage
+	}
+	return 0
+}
+
+func (x *SystemMetrics) GetDiskUsage() float32 {
+	if x != nil {
+		return x.DiskUsage
+	}
+	return 0
+}
+
+type CommandResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Output        string                 `protobuf:"bytes,3,opt,name=output,proto3" json:"output,omitempty"`
+	Error         string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	ExecTimeMs    int64                  `protobuf:"varint,5,opt,name=exec_time_ms,json=execTimeMs,proto3" json:"exec_time_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommandResponse) Reset() {
+	*x = CommandResponse{}
+	mi := &file_homeops_hub_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommandResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommandResponse) ProtoMessage() {}
+
+func (x *CommandResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommandResponse.ProtoReflect.Descriptor instead.
+func (*CommandResponse) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CommandResponse) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *CommandResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CommandResponse) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	return ""
+}
+
+func (x *CommandResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *CommandResponse) GetExecTimeMs() int64 {
+	if x != nil {
+		return x.ExecTimeMs
+	}
+	return 0
+}
+
+type Alert struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp     int64                  `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Level         string                 `protobuf:"bytes,2,opt,name=level,proto3" json:"level,omitempty"`
+	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Alert) Reset() {
+	*x = Alert{}
+	mi := &file_homeops_hub_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Alert) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Alert) ProtoMessage() {}
+
+func (x *Alert) ProtoReflect() protoreflect.Message {
+	mi := &file_homeops_hub_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Alert.ProtoReflect.Descriptor instead.
+func (*Alert) Descriptor() ([]byte, []int) {
+	return file_homeops_hub_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *Alert) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *Alert) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
+}
+
+func (x *Alert) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Alert) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 var File_homeops_hub_proto protoreflect.FileDescriptor
 
 const file_homeops_hub_proto_rawDesc = "" +
@@ -350,10 +780,49 @@ const file_homeops_hub_proto_rawDesc = "" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\"n\n" +
 	"\x15RegisterAgentResponse\x12:\n" +
 	"\x19heartbeat_interval_second\x18\x01 \x01(\x03R\x17heartbeatIntervalSecond\x12\x19\n" +
-	"\bagent_id\x18\x02 \x01(\tR\aagentId2x\n" +
+	"\bagent_id\x18\x02 \x01(\tR\aagentId\"\xe0\x01\n" +
+	"\x14ServerCommandRequest\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x123\n" +
+	"\x04args\x18\x03 \x03(\v2\x1f.ServerCommandRequest.ArgsEntryR\x04args\x12'\n" +
+	"\x0ftimeout_seconds\x18\x04 \x01(\x03R\x0etimeoutSeconds\x1a7\n" +
+	"\tArgsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xbb\x01\n" +
+	"\n" +
+	"AgentEvent\x12\x19\n" +
+	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12*\n" +
+	"\theartbeat\x18\x02 \x01(\v2\n" +
+	".HeartbeatH\x00R\theartbeat\x12=\n" +
+	"\x10command_response\x18\x03 \x01(\v2\x10.CommandResponseH\x00R\x0fcommandResponse\x12\x1e\n" +
+	"\x05alert\x18\x04 \x01(\v2\x06.AlertH\x00R\x05alertB\a\n" +
+	"\x05event\"S\n" +
+	"\tHeartbeat\x12\x1c\n" +
+	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12(\n" +
+	"\ametrics\x18\x02 \x01(\v2\x0e.SystemMetricsR\ametrics\"n\n" +
+	"\rSystemMetrics\x12\x1b\n" +
+	"\tcpu_usage\x18\x01 \x01(\x02R\bcpuUsage\x12!\n" +
+	"\fmemory_usage\x18\x02 \x01(\x02R\vmemoryUsage\x12\x1d\n" +
+	"\n" +
+	"disk_usage\x18\x03 \x01(\x02R\tdiskUsage\"\x9a\x01\n" +
+	"\x0fCommandResponse\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x16\n" +
+	"\x06output\x18\x03 \x01(\tR\x06output\x12\x14\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\x12 \n" +
+	"\fexec_time_ms\x18\x05 \x01(\x03R\n" +
+	"execTimeMs\"s\n" +
+	"\x05Alert\x12\x1c\n" +
+	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\tR\x05level\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription2\xb6\x01\n" +
 	"\x03Hub\x12/\n" +
 	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PongResponse\"\x00\x12@\n" +
-	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\"\x00B<Z:github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeopsb\x06proto3"
+	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\"\x00\x12<\n" +
+	"\x10StreamConnection\x12\v.AgentEvent\x1a\x15.ServerCommandRequest\"\x00(\x010\x01B<Z:github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeopsb\x06proto3"
 
 var (
 	file_homeops_hub_proto_rawDescOnce sync.Once
@@ -367,27 +836,41 @@ func file_homeops_hub_proto_rawDescGZIP() []byte {
 	return file_homeops_hub_proto_rawDescData
 }
 
-var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_homeops_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_homeops_hub_proto_goTypes = []any{
 	(*PongResponse)(nil),          // 0: PongResponse
 	(*RegisterAgentRequest)(nil),  // 1: RegisterAgentRequest
 	(*HostInfo)(nil),              // 2: HostInfo
 	(*Capability)(nil),            // 3: Capability
 	(*RegisterAgentResponse)(nil), // 4: RegisterAgentResponse
-	(*emptypb.Empty)(nil),         // 5: google.protobuf.Empty
+	(*ServerCommandRequest)(nil),  // 5: ServerCommandRequest
+	(*AgentEvent)(nil),            // 6: AgentEvent
+	(*Heartbeat)(nil),             // 7: Heartbeat
+	(*SystemMetrics)(nil),         // 8: SystemMetrics
+	(*CommandResponse)(nil),       // 9: CommandResponse
+	(*Alert)(nil),                 // 10: Alert
+	nil,                           // 11: ServerCommandRequest.ArgsEntry
+	(*emptypb.Empty)(nil),         // 12: google.protobuf.Empty
 }
 var file_homeops_hub_proto_depIdxs = []int32{
-	2, // 0: RegisterAgentRequest.host:type_name -> HostInfo
-	3, // 1: RegisterAgentRequest.capability:type_name -> Capability
-	5, // 2: Hub.Ping:input_type -> google.protobuf.Empty
-	1, // 3: Hub.RegisterAgent:input_type -> RegisterAgentRequest
-	0, // 4: Hub.Ping:output_type -> PongResponse
-	4, // 5: Hub.RegisterAgent:output_type -> RegisterAgentResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2,  // 0: RegisterAgentRequest.host:type_name -> HostInfo
+	3,  // 1: RegisterAgentRequest.capability:type_name -> Capability
+	11, // 2: ServerCommandRequest.args:type_name -> ServerCommandRequest.ArgsEntry
+	7,  // 3: AgentEvent.heartbeat:type_name -> Heartbeat
+	9,  // 4: AgentEvent.command_response:type_name -> CommandResponse
+	10, // 5: AgentEvent.alert:type_name -> Alert
+	8,  // 6: Heartbeat.metrics:type_name -> SystemMetrics
+	12, // 7: Hub.Ping:input_type -> google.protobuf.Empty
+	1,  // 8: Hub.RegisterAgent:input_type -> RegisterAgentRequest
+	6,  // 9: Hub.StreamConnection:input_type -> AgentEvent
+	0,  // 10: Hub.Ping:output_type -> PongResponse
+	4,  // 11: Hub.RegisterAgent:output_type -> RegisterAgentResponse
+	5,  // 12: Hub.StreamConnection:output_type -> ServerCommandRequest
+	10, // [10:13] is the sub-list for method output_type
+	7,  // [7:10] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_homeops_hub_proto_init() }
@@ -395,13 +878,18 @@ func file_homeops_hub_proto_init() {
 	if File_homeops_hub_proto != nil {
 		return
 	}
+	file_homeops_hub_proto_msgTypes[6].OneofWrappers = []any{
+		(*AgentEvent_Heartbeat)(nil),
+		(*AgentEvent_CommandResponse)(nil),
+		(*AgentEvent_Alert)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_homeops_hub_proto_rawDesc), len(file_homeops_hub_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
