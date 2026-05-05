@@ -7,7 +7,7 @@ import (
 
 func toCreateAgentModel(agent domain.RegisterAgentRequest) domainHub.CreateAgentModel {
 	return domainHub.CreateAgentModel{
-		AgentID:      agent.AgentId,
+		AgentID:      agent.AgentID,
 		AgentName:    agent.AgentName,
 		Architecture: agent.Host.Arch,
 		System:       agent.Host.System,

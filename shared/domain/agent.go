@@ -1,7 +1,7 @@
 package domain
 
 type RegisterAgentRequest struct {
-	AgentId      string
+	AgentID      string
 	AgentName    string
 	AgentVersion string
 	Host         HostInfo

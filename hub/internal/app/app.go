@@ -43,7 +43,6 @@ func (a *App) Run() {
 		a.log.Error().Err(err).Msg("failed to connect to the database for migrations")
 		return
 	}
-	defer migratePGConn.Close()
 
 	mgrt, err := migrator.NewMigrator(hubdir.MigrationsFS, "migrations")
 	if err != nil {
@@ -57,7 +56,9 @@ func (a *App) Run() {
 		return
 	}
 	a.log.Info().Msg("migrations applied successfully")
-	migratePGConn.Close()
+	if err := migratePGConn.Close(); err != nil {
+		a.log.Warn().Err(err).Msg("failed to close migrate postgres connection")
+	}
 
 	a.log.Info().Msg("creating database connection pool")
 	pool, err := pgxpool.New(ctx, a.cfg.GetURLPostgres())

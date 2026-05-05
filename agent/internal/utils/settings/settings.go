@@ -13,7 +13,7 @@ type Settings struct {
 	path    string
 }
 
-func ReadSettings(path string) (*Settings, error) {
+func ReadSettings(path string) (sett *Settings, err error) {
 	if path == "" {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -22,7 +22,7 @@ func ReadSettings(path string) (*Settings, error) {
 		path = filepath.Join(homeDir, ".config", "homeops")
 	}
 
-	err := os.Mkdir(path, 0755)
+	err = os.Mkdir(path, 0755)
 	if err != nil {
 		if !errors.Is(err, os.ErrExist) {
 			return nil, err
@@ -39,7 +39,12 @@ func ReadSettings(path string) (*Settings, error) {
 			return nil, err
 		}
 	} else {
-		defer file.Close()
+		defer func() {
+			closeErr := file.Close()
+			if err == nil {
+				err = closeErr
+			}
+		}()
 		err = json.NewDecoder(file).Decode(&settings)
 		if err != nil && !errors.Is(err, io.EOF) {
 			return nil, err
@@ -51,12 +56,17 @@ func ReadSettings(path string) (*Settings, error) {
 	return &settings, nil
 }
 
-func (s *Settings) InsertAgentID(agentID string) error {
+func (s *Settings) InsertAgentID(agentID string) (err error) {
 	file, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		closeErr := file.Close()
+		if err == nil {
+			err = closeErr
+		}
+	}()
 
 	sett := Settings{AgentID: agentID}
 

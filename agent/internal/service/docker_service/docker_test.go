@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-var testError error = errors.New("test")
+var errTest error = errors.New("test")
 
 type DockerMock struct {
 	pingErr      error
@@ -46,11 +46,11 @@ func TestCheckDockerDaemon(t *testing.T) {
 		{
 			name: "docker error",
 			mock: DockerMock{
-				pingErr:      testError,
+				pingErr:      errTest,
 				containers:   nil,
 				containerErr: nil,
 			},
-			wantErr: testError,
+			wantErr: errTest,
 		},
 	}
 
@@ -98,10 +98,10 @@ func TestContainersList(t *testing.T) {
 			mock: DockerMock{
 				pingErr:      nil,
 				containers:   nil,
-				containerErr: testError,
+				containerErr: errTest,
 			},
 			wantLen: 0,
-			wantErr: testError,
+			wantErr: errTest,
 		},
 		{
 			name: "docker empty container",

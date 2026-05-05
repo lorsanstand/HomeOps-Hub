@@ -16,7 +16,7 @@ func toDBAgent(agent domainHub.CreateAgentModel) gen2.CreateAgentParams {
 		System:       agent.System,
 		Hostname:     agent.Hostname,
 		Version:      agent.Version,
-		Capabilities: toJsonCapabilities(agent.Capabilities),
+		Capabilities: toJSONCapabilities(agent.Capabilities),
 	}
 }
 
@@ -28,11 +28,11 @@ func toUpdateDBAgent(agent domainHub.CreateAgentModel) gen2.UpdateAgentByIDParam
 		System:       agent.System,
 		Hostname:     agent.Hostname,
 		Version:      agent.Version,
-		Capabilities: toJsonCapabilities(agent.Capabilities),
+		Capabilities: toJSONCapabilities(agent.Capabilities),
 	}
 }
 
-func toJsonCapabilities(caps []domain.Capability) []byte {
+func toJSONCapabilities(caps []domain.Capability) []byte {
 	data, err := json.Marshal(caps)
 	if err != nil {
 		// Note: Error is silently handled - consider logging in production

@@ -55,7 +55,11 @@ func (a *App) Run() {
 	a.log.Info().Msg("connection to the hub successful")
 
 	conn := rpc.NewConnectAgent(GRPCConn)
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			a.log.Warn().Err(err).Msg("failed to close rpc connection")
+		}
+	}()
 
 	var DockerService collector.Docker
 

@@ -30,16 +30,16 @@ func NewHubService(store Store, logger zerolog.Logger) *HubService {
 }
 
 func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error) {
-	h.log.Debug().Str("agentID", data.AgentId).Str("agentName", data.AgentName).Msg("started registering agent")
-	agent, err := h.store.GetAgentByAgentID(ctx, data.AgentId)
+	h.log.Debug().Str("agentID", data.AgentID).Str("agentName", data.AgentName).Msg("started registering agent")
+	agent, err := h.store.GetAgentByAgentID(ctx, data.AgentID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return domain.RegisterAgentResponse{}, fmt.Errorf("failed select agent to db: %w", err)
 	}
 
-	if data.AgentId != "" && !errors.Is(err, sql.ErrNoRows) {
+	if data.AgentID != "" && !errors.Is(err, sql.ErrNoRows) {
 		h.log.Debug().Str("agentID", agent.AgentID).Str("agentName", data.AgentName).Msg("agent exists, updating")
 
-		data.AgentId = agent.AgentID
+		data.AgentID = agent.AgentID
 
 		agentStore := toCreateAgentModel(data)
 
@@ -55,7 +55,7 @@ func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgen
 		return domain.RegisterAgentResponse{}, fmt.Errorf("generate agent ID: %w", err)
 	}
 
-	data.AgentId = AgentID
+	data.AgentID = AgentID
 
 	agentStore := toCreateAgentModel(data)
 

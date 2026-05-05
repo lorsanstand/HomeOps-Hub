@@ -10,7 +10,7 @@ func ToDomainAgentRequest(request *pb.RegisterAgentRequest) RegisterAgentRequest
 	}
 
 	return RegisterAgentRequest{
-		AgentId:   request.AgentId,
+		AgentID:   request.AgentId,
 		AgentName: request.AgentName,
 		Host: HostInfo{
 			System:   request.Host.System,
@@ -53,7 +53,7 @@ func ToDomainCapabilities(capability []*pb.Capability) []Capability {
 
 func ToGRPCAgentRequest(request RegisterAgentRequest) pb.RegisterAgentRequest {
 	return pb.RegisterAgentRequest{
-		AgentId:   request.AgentId,
+		AgentId:   request.AgentID,
 		AgentName: request.AgentName,
 		Host: &pb.HostInfo{
 			Hostname: request.Host.Hostname,

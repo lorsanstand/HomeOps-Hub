@@ -50,7 +50,7 @@ func (a *AgentService) RegisterAgentConn(ctx context.Context) error {
 	AgentID := a.settings.GetAgentID()
 	AgentName := a.cfg.AppName
 	AgentData := domain.RegisterAgentRequest{
-		AgentId:      AgentID,
+		AgentID:      AgentID,
 		AgentName:    AgentName,
 		Host:         info,
 		Capabilities: caps,
