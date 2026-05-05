@@ -6,10 +6,11 @@ import (
 	"errors"
 	"fmt"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/golang-migrate/migrate/v4/database/sqlite"
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite"
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
 
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
@@ -27,24 +28,18 @@ func NewMigrator(sqlFiles embed.FS, dirname string) (*Migrator, error) {
 }
 
 func (m *Migrator) ApplyMigrations(db *sql.DB) (err error) {
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := sqlite.WithInstance(db, &sqlite.Config{})
 	if err != nil {
 		return fmt.Errorf("unable to create db instance: %w", err)
 	}
 
-	migrator, err := migrate.NewWithInstance("migration_embeded_sql_files", m.srcDriver, "psql_db", driver)
+	migrator, err := migrate.NewWithInstance("migration_embeded_sql_files", m.srcDriver, "sqlite", driver)
 	if err != nil {
 		return fmt.Errorf("unable to create migration: %w", err)
 	}
 
-	defer func() {
-		closeErr, _ := migrator.Close()
-		if err == nil {
-			err = closeErr
-		}
-	}()
-
 	if err = migrator.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		migrator.Close()
 		return fmt.Errorf("unable to apply migrations: %w", err)
 	}
 

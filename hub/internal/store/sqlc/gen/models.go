@@ -5,17 +5,17 @@
 package gen
 
 import (
-	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
 type Agent struct {
-	ID           int32
+	ID           int64
 	AgentID      string
 	AgentName    *string
 	Architecture string
 	System       string
 	Hostname     string
 	Version      string
-	Capabilities []byte
-	RegisteredAt pgtype.Timestamp
+	Capabilities *string
+	RegisteredAt time.Time
 }
