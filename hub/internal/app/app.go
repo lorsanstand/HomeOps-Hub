@@ -1,13 +1,11 @@
 package app
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	standartlog "log"
 	"net"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	hubdir "github.com/lorsanstand/HomeOps-Hub/hub/internal"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/migrator"
 	grpcserv "github.com/lorsanstand/HomeOps-Hub/hub/internal/rpc"
@@ -15,6 +13,7 @@ import (
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/store"
 	"github.com/lorsanstand/HomeOps-Hub/shared/config"
 	"github.com/lorsanstand/HomeOps-Hub/shared/log"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog"
 )
 
@@ -36,13 +35,18 @@ func NewApp() *App {
 }
 
 func (a *App) Run() {
-	ctx := context.Background()
-	a.log.Info().Str("host", a.cfg.DBHost).Int("port", a.cfg.DBPort).Msg("connecting to database")
-	migratePGConn, err := sql.Open("pgx", a.cfg.GetURLPostgres())
+	a.log.Info().Msg("connecting to database")
+	DBConn, err := sql.Open("sqlite", "database.db")
 	if err != nil {
-		a.log.Error().Err(err).Msg("failed to connect to the database for migrations")
+		a.log.Error().Err(err).Msg("failed to connect to the database")
 		return
 	}
+
+	defer func() {
+		if err := DBConn.Close(); err != nil {
+			a.log.Warn().Err(err).Msg("failed to close migrate postgres connection")
+		}
+	}()
 
 	mgrt, err := migrator.NewMigrator(hubdir.MigrationsFS, "migrations")
 	if err != nil {
@@ -51,25 +55,13 @@ func (a *App) Run() {
 	}
 
 	a.log.Info().Msg("applying database migrations")
-	if err = mgrt.ApplyMigrations(migratePGConn); err != nil {
+	if err = mgrt.ApplyMigrations(DBConn); err != nil {
 		a.log.Error().Err(err).Msg("migrations failed to apply")
 		return
 	}
 	a.log.Info().Msg("migrations applied successfully")
-	if err := migratePGConn.Close(); err != nil {
-		a.log.Warn().Err(err).Msg("failed to close migrate postgres connection")
-	}
 
-	a.log.Info().Msg("creating database connection pool")
-	pool, err := pgxpool.New(ctx, a.cfg.GetURLPostgres())
-	if err != nil {
-		a.log.Error().Err(err).Msg("failed to create database connection pool")
-		return
-	}
-	defer pool.Close()
-	a.log.Info().Msg("database connection pool created")
-
-	hubStore := store.NewHubStore(pool)
+	hubStore := store.NewHubStore(DBConn)
 	hubService := hub_service.NewHubService(hubStore, a.log)
 
 	a.log.Info().Msg("starting hub service")

@@ -2,8 +2,8 @@ package store
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/store/sqlc/gen"
 )
@@ -12,7 +12,7 @@ type HubStore struct {
 	queries *gen.Queries
 }
 
-func NewHubStore(db *pgxpool.Pool) *HubStore {
+func NewHubStore(db *sql.DB) *HubStore {
 	queries := gen.New(db)
 	return &HubStore{queries}
 }
@@ -31,6 +31,6 @@ func (h *HubStore) GetAgentByAgentID(ctx context.Context, AgentID string) (domai
 
 func (h *HubStore) UpdateAgentByID(ctx context.Context, ID int, updateAgent domainHub.CreateAgentModel) error {
 	data := toUpdateDBAgent(updateAgent)
-	data.ID = int32(ID)
+	data.ID = int64(ID)
 	return h.queries.UpdateAgentByID(ctx, data)
 }
