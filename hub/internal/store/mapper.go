@@ -9,6 +9,8 @@ import (
 )
 
 func toDBAgent(agent domainHub.CreateAgentModel) gen2.CreateAgentParams {
+	jsonCaps := toJSONCapabilities(agent.Capabilities)
+	capsStr := string(jsonCaps)
 	return gen2.CreateAgentParams{
 		AgentID:      agent.AgentID,
 		AgentName:    &agent.AgentName,
@@ -16,11 +18,13 @@ func toDBAgent(agent domainHub.CreateAgentModel) gen2.CreateAgentParams {
 		System:       agent.System,
 		Hostname:     agent.Hostname,
 		Version:      agent.Version,
-		Capabilities: toJSONCapabilities(agent.Capabilities),
+		Capabilities: &capsStr,
 	}
 }
 
 func toUpdateDBAgent(agent domainHub.CreateAgentModel) gen2.UpdateAgentByIDParams {
+	jsonCaps := toJSONCapabilities(agent.Capabilities)
+	capsStr := string(jsonCaps)
 	return gen2.UpdateAgentByIDParams{
 		AgentID:      agent.AgentID,
 		AgentName:    &agent.AgentName,
@@ -28,7 +32,7 @@ func toUpdateDBAgent(agent domainHub.CreateAgentModel) gen2.UpdateAgentByIDParam
 		System:       agent.System,
 		Hostname:     agent.Hostname,
 		Version:      agent.Version,
-		Capabilities: toJSONCapabilities(agent.Capabilities),
+		Capabilities: &capsStr,
 	}
 }
 
@@ -47,6 +51,11 @@ func toAgentModel(dbAgent gen2.Agent) domainHub.AgentModel {
 		dbAgentName = *dbAgent.AgentName
 	}
 
+	var capsBytes []byte
+	if dbAgent.Capabilities != nil {
+		capsBytes = []byte(*dbAgent.Capabilities)
+	}
+
 	return domainHub.AgentModel{
 		ID:           int(dbAgent.ID),
 		AgentID:      dbAgent.AgentID,
@@ -54,7 +63,7 @@ func toAgentModel(dbAgent gen2.Agent) domainHub.AgentModel {
 		Architecture: dbAgent.Architecture,
 		System:       dbAgent.System,
 		Hostname:     dbAgent.Hostname,
-		Capabilities: toDomainCapabilities(dbAgent.Capabilities),
+		Capabilities: toDomainCapabilities(capsBytes),
 	}
 }
 
