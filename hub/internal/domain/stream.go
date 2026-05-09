@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type AgentRequest struct {
 	RequestID string
 	Name      string
@@ -28,7 +30,15 @@ type SystemMetrics struct {
 	DiskUsage   float64
 }
 
-type Heartbeat struct {
-	Timestamp string
+type HeartbeatModel struct {
+	ID        int
+	AgentID   string
+	Timestamp time.Time
+	Metrics   SystemMetrics
+}
+
+type CreateHeartbeatModel struct {
+	AgentID   string
+	Timestamp time.Time
 	Metrics   SystemMetrics
 }
