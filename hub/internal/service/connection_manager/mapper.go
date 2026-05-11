@@ -20,3 +20,22 @@ func toCreateHeartbeatModel(agentID string, heartbeat *pb.AgentEvent_Heartbeat) 
 		},
 	}
 }
+
+func toGRPCCommandRequest(request domainHub.AgentRequest) pb.ServerCommandRequest {
+	return pb.ServerCommandRequest{
+		RequestId:      request.RequestID,
+		Name:           request.Name,
+		TimeoutSeconds: int64(request.TimeOut),
+		Args:           request.Args,
+	}
+}
+
+func toAgentResponse(response *pb.AgentEvent_CommandResponse) domainHub.AgentResponse {
+	return domainHub.AgentResponse{
+		RequestID:  response.CommandResponse.RequestId,
+		Success:    response.CommandResponse.Success,
+		Error:      response.CommandResponse.Error,
+		Output:     response.CommandResponse.Output,
+		ExecTimeMS: int(response.CommandResponse.ExecTimeMs),
+	}
+}

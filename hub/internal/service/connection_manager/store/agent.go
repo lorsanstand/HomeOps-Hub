@@ -22,10 +22,11 @@ func (r *ResponseStore) Write(responseID string, channel chan domainHub.AgentRes
 	r.store[responseID] = channel
 }
 
-func (r *ResponseStore) Read(responseID string) chan domainHub.AgentResponse {
+func (r *ResponseStore) Read(responseID string) (chan domainHub.AgentResponse, bool) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
-	return r.store[responseID]
+	ch, ok := r.store[responseID]
+	return ch, ok
 }
 
 func (r *ResponseStore) Delete(responseID string) {
