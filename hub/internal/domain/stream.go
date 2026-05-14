@@ -3,14 +3,12 @@ package domain
 import "time"
 
 type AgentRequest struct {
-	RequestID string
-	Name      string
-	Args      map[string]string
-	TimeOut   int
+	Name    string
+	Args    map[string]string
+	TimeOut int
 }
 
 type AgentResponse struct {
-	RequestID  string
 	Success    bool
 	Output     string
 	Error      string

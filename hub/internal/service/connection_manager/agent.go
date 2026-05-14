@@ -68,12 +68,12 @@ func (a *AgentConnection) Listen() error {
 				heartbeat := toCreateHeartbeatModel(a.AgentID, x)
 				heartbeatsChan <- heartbeat
 			case *pb.AgentEvent_CommandResponse:
-				response := toAgentResponse(x)
-				ch, ok := a.response.Read(response.RequestID)
+				ch, ok := a.response.Read(x.CommandResponse.RequestId)
 				if !ok {
-					a.log.Warn().Str("requestID", response.RequestID).Msg("not found channel for send response")
+					a.log.Warn().Str("requestID", x.CommandResponse.RequestId).Msg("not found channel for send response")
 					continue
 				}
+				response := toAgentResponse(x)
 				ch <- response
 			}
 		}
@@ -124,7 +124,7 @@ func (a *AgentConnection) Execute(ctx context.Context, request domainHub.AgentRe
 	a.response.Write(requestID, ch)
 	defer a.response.Delete(requestID)
 
-	err := a.stream.Send(new(toGRPCCommandRequest(request)))
+	err := a.stream.Send(new(toGRPCCommandRequest(requestID, request)))
 	if err != nil {
 		return domainHub.AgentResponse{}, fmt.Errorf("execute command: %w", err)
 	}
@@ -137,7 +137,7 @@ func (a *AgentConnection) Execute(ctx context.Context, request domainHub.AgentRe
 	case <-ctx.Done():
 		return domainHub.AgentResponse{}, fmt.Errorf("request timeout")
 	case response := <-ch:
-		a.log.Info().Str("requestID", response.RequestID).Msg("received response")
+		a.log.Info().Str("requestID", requestID).Msg("received response")
 		return response, nil
 	}
 }
