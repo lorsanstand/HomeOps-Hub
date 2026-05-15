@@ -97,7 +97,7 @@ func (a *AgentConnection) listenHeartbeat(heartbeats <-chan domainHub.CreateHear
 			}
 
 			a.log.Warn().Msg("agent not send heartbeat")
-			a.cancel()
+			a.Close()
 			return
 		case heartbeat := <-heartbeats:
 			a.log.Debug().
