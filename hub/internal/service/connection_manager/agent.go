@@ -9,30 +9,23 @@ import (
 	"github.com/google/uuid"
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
-	"github.com/lorsanstand/HomeOps-Hub/hub/internal/service/connection_manager/store"
 	"github.com/rs/zerolog"
 )
 
-type statusAgent interface {
-	Offline()
-	Online()
-}
-
-// использовать sync.Pool что бы переиспользвоать этот обьект
 type AgentConnection struct {
 	stream             streamConn
 	heartbeat          heartbeatStore
 	log                zerolog.Logger
 	status             statusAgent
 	AgentID            string
-	response           *store.ResponseStore
+	response           *ResponseStore
 	ctx                context.Context
 	cancel             context.CancelFunc
 	heartbeatTimeoutMS int
 }
 
 func newAgentConnection(agentID string, stream streamConn, heartbeat heartbeatStore, status statusAgent, heartbeatTimeoutMS int, logger zerolog.Logger) *AgentConnection {
-	response := store.NewResponseStore()
+	response := NewResponseStore()
 	logger = logger.With().Str("agentID", agentID).Logger()
 	ctx, cancel := context.WithCancel(stream.Context())
 	return &AgentConnection{stream: stream, response: response, heartbeat: heartbeat, log: logger, AgentID: agentID, status: status, ctx: ctx, cancel: cancel, heartbeatTimeoutMS: heartbeatTimeoutMS}
@@ -135,7 +128,7 @@ func (a *AgentConnection) Execute(ctx context.Context, request domainHub.AgentRe
 
 	select {
 	case <-a.ctx.Done():
-		return domainHub.AgentResponse{}, ConnectionCloseErr
+		return domainHub.AgentResponse{}, ErrConnectionClose
 	case <-ctx.Done():
 		return domainHub.AgentResponse{}, ctx.Err()
 	case response := <-ch:

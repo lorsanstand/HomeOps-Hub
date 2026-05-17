@@ -15,13 +15,13 @@ import (
 )
 
 type streamMock struct {
-	recvCh  chan *pb.AgentEvent
-	sendCh  chan *pb.ServerCommandRequest
-	closeCh chan struct{}
-	ctx     context.Context
-	mu      sync.Mutex
-	sendErr error
-	recvErr error
+	recvCh    chan *pb.AgentEvent
+	sendCh    chan *pb.ServerCommandRequest
+	closeCh   chan struct{}
+	ctx       context.Context
+	mu        sync.Mutex
+	sendErr   error
+	recvErr   error
 	closeOnce sync.Once
 }
 
@@ -260,7 +260,7 @@ func TestAgentConnection_HeartbeatTimeout(t *testing.T) {
 			Args:    nil,
 			TimeOut: 0,
 		})
-		assert.ErrorIs(t, err, ConnectionCloseErr)
+		assert.ErrorIs(t, err, ErrConnectionClose)
 		wg.Done()
 	}()
 
@@ -286,7 +286,7 @@ func TestAgentConnection_ConnectionClose(t *testing.T) {
 			Args:    nil,
 			TimeOut: 0,
 		})
-		assert.ErrorIs(t, err, ConnectionCloseErr)
+		assert.ErrorIs(t, err, ErrConnectionClose)
 		wg.Done()
 	}()
 
@@ -365,7 +365,7 @@ func TestAgentConnection_ExecuteConnectionCanceled(t *testing.T) {
 	h.cancel()
 
 	_, err := h.agent.Execute(context.Background(), domainHub.AgentRequest{Name: "test"})
-	assert.ErrorIs(t, err, ConnectionCloseErr)
+	assert.ErrorIs(t, err, ErrConnectionClose)
 }
 
 func TestAgentConnection_UnknownResponseID(t *testing.T) {

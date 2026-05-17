@@ -2,4 +2,6 @@ package connection_manager
 
 import "errors"
 
-var ConnectionCloseErr error = errors.New("connection close")
+var ErrConnectionClose = errors.New("connection close")
+
+var ErrNotFoundConn = errors.New("agent connection not found")

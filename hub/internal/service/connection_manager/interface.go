@@ -17,3 +17,12 @@ type streamConn interface {
 type heartbeatStore interface {
 	CreateHeartbeat(ctx context.Context, heartbeat domainHub.CreateHeartbeatModel) error
 }
+
+type statusAgent interface {
+	Offline()
+	Online()
+}
+
+type statusNotifier interface {
+	New(AgentID string) statusAgent
+}
