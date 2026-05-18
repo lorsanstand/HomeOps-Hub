@@ -1,6 +1,6 @@
 CREATE TABLE heartbeats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    agent_id VARCHAR(32) UNIQUE NOT NULL,
+    agent_id VARCHAR(32) NOT NULL,
     cpu_usage FLOAT NOT NULL ,
     memory_usage FLOAT NOT NULL ,
     disk_usage FLOAT NOT NULL ,
