@@ -90,9 +90,12 @@ func (a *AgentConnection) listenHeartbeat(heartbeats <-chan domainHub.CreateHear
 			}
 
 			a.log.Warn().Msg("agent not send heartbeat")
-			a.Close()
+			_ = a.Close()
 			return
-		case heartbeat := <-heartbeats:
+		case heartbeat, ok := <-heartbeats:
+			if !ok {
+				return
+			}
 			a.log.Debug().
 				Float64("cpu usage", heartbeat.Metrics.CpuUsage).
 				Float64("disk usage", heartbeat.Metrics.DiskUsage).
