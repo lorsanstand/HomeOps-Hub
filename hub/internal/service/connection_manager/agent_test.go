@@ -30,7 +30,7 @@ func newAgentTestHarness(t *testing.T, heartbeatTimeoutMS int) *agentTestHarness
 	recvStream := make(chan *pb.AgentEvent, 4)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	stream := &streamMock{recvCh: recvStream, sendCh: sendStream, ctx: ctx, closeCh: make(chan struct{}, 1)}
+	stream := &streamMock{recvCh: recvStream, sendCh: sendStream, ctx: ctx}
 	heartbeat := &heartBeatMock{doneCh: make(chan struct{}, 2)}
 	status := &statusMock{doneCh: make(chan struct{}, 2)}
 
@@ -55,15 +55,6 @@ func waitFor(t *testing.T, ch <-chan struct{}, timeout time.Duration, message st
 	}
 }
 
-func waitForClose(t *testing.T, closeCh <-chan struct{}, timeout time.Duration) {
-	t.Helper()
-	select {
-	case <-closeCh:
-	case <-time.After(timeout):
-		t.Fatal("timeout waiting for close")
-	}
-}
-
 func commandResponseEvent(requestID, output string) *pb.AgentEvent {
 	return &pb.AgentEvent{
 		AgentId: "agent-1",
@@ -79,7 +70,11 @@ func commandResponseEvent(requestID, output string) *pb.AgentEvent {
 
 func TestAgentConnection_Heartbeat(t *testing.T) {
 	h := newAgentTestHarness(t, 5000)
-	go h.agent.Listen()
+	done := make(chan struct{})
+	go func() {
+		_ = h.agent.Listen()
+		close(done)
+	}()
 
 	h.recvCh <- &pb.AgentEvent{AgentId: "agent-1", Event: &pb.AgentEvent_Heartbeat{
 		Heartbeat: &pb.Heartbeat{
@@ -98,7 +93,7 @@ func TestAgentConnection_Heartbeat(t *testing.T) {
 	assert.Equal(t, h.status.IsOnline(), true)
 
 	h.cancel()
-	waitForClose(t, h.stream.closeCh, 500*time.Millisecond)
+	waitFor(t, done, 500*time.Millisecond, "timeout waiting for listen stop")
 	assert.Equal(t, h.status.IsOnline(), false)
 }
 
@@ -142,13 +137,11 @@ func TestAgentConnection_Execute(t *testing.T) {
 
 func TestAgentConnection_HeartbeatTimeout(t *testing.T) {
 	h := newAgentTestHarness(t, 200)
-	var wg sync.WaitGroup
+	listenDone := make(chan error, 1)
+	execDone := make(chan error, 1)
 
-	wg.Add(2)
 	go func() {
-		err := h.agent.Listen()
-		assert.NilError(t, err)
-		wg.Done()
+		listenDone <- h.agent.Listen()
 	}()
 
 	go func() {
@@ -157,13 +150,25 @@ func TestAgentConnection_HeartbeatTimeout(t *testing.T) {
 			Args:    nil,
 			TimeOut: 0,
 		})
-		assert.ErrorIs(t, err, ErrConnectionClose)
-		wg.Done()
+		execDone <- err
 	}()
 
-	wg.Wait()
-
-	waitForClose(t, h.stream.closeCh, 500*time.Millisecond)
+	timeout := time.After(2 * time.Second)
+	gotListen := false
+	gotExec := false
+	for !(gotListen && gotExec) {
+		select {
+		case err := <-listenDone:
+			assert.ErrorIs(t, err, context.Canceled)
+			gotListen = true
+		case err := <-execDone:
+			assert.ErrorIs(t, err, ErrConnectionClose)
+			gotExec = true
+		case <-timeout:
+			h.cancel()
+			t.Fatal("timeout waiting for heartbeat timeout")
+		}
+	}
 }
 
 func TestAgentConnection_ConnectionClose(t *testing.T) {
@@ -190,8 +195,6 @@ func TestAgentConnection_ConnectionClose(t *testing.T) {
 	h.cancel()
 
 	wg.Wait()
-
-	waitForClose(t, h.stream.closeCh, 500*time.Millisecond)
 }
 
 func TestAgentConnection_ExecuteClose(t *testing.T) {
@@ -219,23 +222,10 @@ func TestAgentConnection_ExecuteClose(t *testing.T) {
 
 func TestAgentConnection_ListenEOF(t *testing.T) {
 	h := newAgentTestHarness(t, 5000)
-	h.stream.Close()
+	h.stream.CloseRecv()
 
 	err := h.agent.Listen()
 	assert.NilError(t, err)
-	waitForClose(t, h.stream.closeCh, 500*time.Millisecond)
-}
-
-func TestAgentConnection_ListenRecvError(t *testing.T) {
-	h := newAgentTestHarness(t, 5000)
-
-	recvErr := errors.New("recv failure")
-	h.stream.mu.Lock()
-	h.stream.recvErr = recvErr
-	h.stream.mu.Unlock()
-
-	err := h.agent.Listen()
-	assert.ErrorIs(t, err, recvErr)
 }
 
 func TestAgentConnection_ExecuteSendError(t *testing.T) {
@@ -267,7 +257,11 @@ func TestAgentConnection_ExecuteConnectionCanceled(t *testing.T) {
 
 func TestAgentConnection_UnknownResponseID(t *testing.T) {
 	h := newAgentTestHarness(t, 5000)
-	go h.agent.Listen()
+	done := make(chan struct{})
+	go func() {
+		_ = h.agent.Listen()
+		close(done)
+	}()
 
 	h.recvCh <- &pb.AgentEvent{AgentId: "agent-1", Event: &pb.AgentEvent_CommandResponse{
 		CommandResponse: &pb.CommandResponse{
@@ -277,7 +271,7 @@ func TestAgentConnection_UnknownResponseID(t *testing.T) {
 		}}}
 
 	h.cancel()
-	waitForClose(t, h.stream.closeCh, 500*time.Millisecond)
+	waitFor(t, done, 500*time.Millisecond, "timeout waiting for listen stop")
 }
 
 func TestAgentConnection_HeartbeatErrorDoesNotStop(t *testing.T) {

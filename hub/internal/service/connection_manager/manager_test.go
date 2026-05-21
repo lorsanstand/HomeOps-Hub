@@ -42,13 +42,13 @@ func TestNewConnectionManager_NewConnection(t *testing.T) {
 	ctx := metadata.NewIncomingContext(context.Background(), newMetadataAgentID(t, agentID))
 
 	stream := streamMock{ctx: ctx,
-		recvCh:  make(chan *pb.AgentEvent, 1),
-		sendCh:  make(chan *pb.ServerCommandRequest, 1),
-		closeCh: make(chan struct{}, 1),
+		recvCh: make(chan *pb.AgentEvent, 1),
+		sendCh: make(chan *pb.ServerCommandRequest, 1),
 	}
 
-	err := h.manager.NewConnection(&stream)
-	assert.NilError(t, err)
+	go func() {
+		_ = h.manager.NewConnection(&stream)
+	}()
 
 	select {
 	case ID := <-h.status.agentIDCh:
@@ -70,13 +70,19 @@ func TestNewConnectionManager_NewConnectionNotAgentID(t *testing.T) {
 	h := newConnectionManagerTestHarness(t)
 
 	stream := streamMock{ctx: context.Background(),
-		recvCh:  make(chan *pb.AgentEvent, 1),
-		sendCh:  make(chan *pb.ServerCommandRequest, 1),
-		closeCh: make(chan struct{}, 1),
+		recvCh: make(chan *pb.AgentEvent, 1),
+		sendCh: make(chan *pb.ServerCommandRequest, 1),
 	}
 
-	err := h.manager.NewConnection(&stream)
-	assert.ErrorContains(t, err, "get agent id")
+	wait := make(chan struct{})
+
+	go func() {
+		err := h.manager.NewConnection(&stream)
+		assert.ErrorContains(t, err, "get agent id")
+		wait <- struct{}{}
+	}()
+
+	waitFor(t, wait, 5000, "timeout new connection")
 }
 
 func TestNewConnectionManager_AgentNotFound(t *testing.T) {

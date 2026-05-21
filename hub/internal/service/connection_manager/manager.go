@@ -27,22 +27,18 @@ func (c *ConnectionManager) NewConnection(stream streamConn) error {
 		c.log.Error().Err(err).Msg("missing agent id in metadata")
 		return fmt.Errorf("get agent id: %w", err)
 	}
+
 	c.log.Info().Str("agentID", AgentID).Msg("connection accepted")
 
 	status := c.status.New(AgentID)
 
 	agent := newAgentConnection(AgentID, stream, c.heartbeat, status, heartbeatTimeoutMS, c.log)
 	c.agentConnStore.Add(AgentID, agent)
-	go func() {
-		c.log.Debug().Str("agentID", AgentID).Msg("start listening")
-		err := agent.Listen()
-		if err != nil {
-			c.log.Error().Err(err).Msg("listening agent stopped")
-		}
-		c.agentConnStore.Delete(AgentID)
-	}()
+	defer c.agentConnStore.Delete(AgentID)
 
-	return nil
+	c.log.Debug().Str("agentID", AgentID).Msg("start listening")
+
+	return agent.Listen()
 }
 
 func (c *ConnectionManager) GetConnection(AgentID string) (*AgentConnection, error) {

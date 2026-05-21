@@ -12,7 +12,6 @@ import (
 type streamMock struct {
 	recvCh    chan *pb.AgentEvent
 	sendCh    chan *pb.ServerCommandRequest
-	closeCh   chan struct{}
 	ctx       context.Context
 	mu        sync.Mutex
 	sendErr   error
@@ -53,15 +52,10 @@ func (f *streamMock) Recv() (*pb.AgentEvent, error) {
 	}
 }
 
-func (f *streamMock) Close() error {
-	select {
-	case f.closeCh <- struct{}{}:
-	default:
-	}
+func (f *streamMock) CloseRecv() {
 	f.closeOnce.Do(func() {
 		close(f.recvCh)
 	})
-	return nil
 }
 
 type heartBeatMock struct {

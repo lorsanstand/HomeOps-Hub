@@ -32,36 +32,31 @@ func newAgentConnection(agentID string, stream streamConn, heartbeat heartbeatSt
 }
 
 func (a *AgentConnection) Listen() error {
-	defer a.status.Offline()
+	heartbeatsCh := make(chan domainHub.CreateHeartbeatModel, 5)
+	streamRecvCh := make(chan *pb.AgentEvent, 5)
 
-	heartbeatsChan := make(chan domainHub.CreateHeartbeatModel, 5)
-	go a.listenHeartbeat(heartbeatsChan)
-	defer close(heartbeatsChan)
+	go a.listenHeartbeat(heartbeatsCh)
+	go a.listenStream(streamRecvCh)
 
 	defer func() {
-		err := a.Close()
-		if err != nil {
-			a.log.Warn().Err(err).Msg("failed stream close")
-		}
+		a.status.Offline()
+		close(heartbeatsCh)
+		a.Close()
 	}()
 
 	for {
 		select {
 		case <-a.ctx.Done():
 			return a.ctx.Err()
-		default:
-			agentEvent, err := a.stream.Recv()
-			if err == io.EOF {
+		case msg, ok := <-streamRecvCh:
+			if !ok {
 				return nil
 			}
-			if err != nil {
-				return fmt.Errorf("stream: %w", err)
-			}
 
-			switch x := agentEvent.Event.(type) {
+			switch x := msg.Event.(type) {
 			case *pb.AgentEvent_Heartbeat:
 				heartbeat := toCreateHeartbeatModel(a.AgentID, x)
-				heartbeatsChan <- heartbeat
+				heartbeatsCh <- heartbeat
 			case *pb.AgentEvent_CommandResponse:
 				ch, ok := a.response.Read(x.CommandResponse.RequestId)
 				if !ok {
@@ -71,7 +66,24 @@ func (a *AgentConnection) Listen() error {
 				response := toAgentResponse(x)
 				ch <- response
 			}
+		default:
 		}
+	}
+}
+
+func (a *AgentConnection) listenStream(ch chan *pb.AgentEvent) {
+	defer close(ch)
+	for {
+		agentEvent, err := a.stream.Recv()
+		if err == io.EOF {
+			return
+		}
+		if err != nil {
+			a.log.Warn().Err(err).Msg("close stream")
+			return
+		}
+
+		ch <- agentEvent
 	}
 }
 
@@ -90,7 +102,7 @@ func (a *AgentConnection) listenHeartbeat(heartbeats <-chan domainHub.CreateHear
 			}
 
 			a.log.Warn().Msg("agent not send heartbeat")
-			_ = a.Close()
+			a.Close()
 			return
 		case heartbeat, ok := <-heartbeats:
 			if !ok {
@@ -140,7 +152,6 @@ func (a *AgentConnection) Execute(ctx context.Context, request domainHub.AgentRe
 	}
 }
 
-func (a *AgentConnection) Close() error {
+func (a *AgentConnection) Close() {
 	a.cancel()
-	return a.stream.Close()
 }

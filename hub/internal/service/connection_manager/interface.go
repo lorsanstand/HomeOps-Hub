@@ -11,7 +11,6 @@ type streamConn interface {
 	Send(request *pb.ServerCommandRequest) error
 	Recv() (*pb.AgentEvent, error)
 	Context() context.Context
-	Close() error
 }
 
 type heartbeatStore interface {
