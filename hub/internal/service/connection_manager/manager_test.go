@@ -24,7 +24,7 @@ func newConnectionManagerTestHarness(t *testing.T) *connectionManagerTestHarness
 	heartbeat := &heartBeatMock{doneCh: make(chan struct{}, 2)}
 	status := &statusNotifierMock{agentIDCh: make(chan string, 1)}
 
-	manager := NewConnectionManager(heartbeat, status, zerolog.New(nil))
+	manager := NewConnectionManager(heartbeat, status, 10000, zerolog.New(nil))
 
 	return &connectionManagerTestHarness{manager: manager, status: status, heartbeat: heartbeat}
 }

@@ -59,9 +59,9 @@ func (a *App) Run() {
 	a.log.Info().Msg("migrations applied successfully")
 
 	hubStore := store.NewHubStore(DBConn)
-	hubService := hub_service.NewHubService(hubStore, a.log)
+	hubService := hub_service.NewHubService(hubStore, a.cfg.Heartbeat, a.log)
 	statusNotifier := notifier.NewStatusNotifier()
-	connManger := connection_manager.NewConnectionManager(hubStore, statusNotifier, a.log)
+	connManger := connection_manager.NewConnectionManager(hubStore, statusNotifier, a.cfg.Heartbeat*1000, a.log)
 
 	a.log.Info().Msg("starting hub service")
 

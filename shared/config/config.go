@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	LogLevel string `env:"LOG_LEVEL" env-default:"INFO"`
-	Mode     string `env:"MODE" env-default:"DEV"`
-	Port     int    `env:"PORT" env-default:"9000"`
+	LogLevel  string `env:"LOG_LEVEL" env-default:"INFO"`
+	Mode      string `env:"MODE" env-default:"DEV"`
+	Port      int    `env:"PORT" env-default:"9000"`
+	Heartbeat int    `env:"HEARTBEAT" env-default:"5"`
 }
 
 func NewConfig() (*Config, error) {
