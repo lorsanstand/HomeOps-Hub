@@ -9,8 +9,10 @@ import (
 	hubdir "github.com/lorsanstand/HomeOps-Hub/hub/internal"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/migrator"
 	grpcserv "github.com/lorsanstand/HomeOps-Hub/hub/internal/rpc"
+	"github.com/lorsanstand/HomeOps-Hub/hub/internal/service/connection_manager"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/service/hub_service"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/store"
+	"github.com/lorsanstand/HomeOps-Hub/hub/internal/utils/notifier"
 	"github.com/lorsanstand/HomeOps-Hub/shared/config"
 	"github.com/lorsanstand/HomeOps-Hub/shared/log"
 	_ "github.com/mattn/go-sqlite3"
@@ -63,19 +65,21 @@ func (a *App) Run() {
 
 	hubStore := store.NewHubStore(DBConn)
 	hubService := hub_service.NewHubService(hubStore, a.log)
+	statusNotifier := notifier.NewStatusNotifier()
+	connManger := connection_manager.NewConnectionManager(hubStore, statusNotifier, a.log)
 
 	a.log.Info().Msg("starting hub service")
-	err = a.hubServe(hubService)
+	err = a.hubServe(hubService, connManger)
 	if err != nil {
 		a.log.Error().Err(err).Msg("hub service failed to start")
 		return
 	}
 }
 
-func (a *App) hubServe(hubService *hub_service.HubService) error {
+func (a *App) hubServe(hubService *hub_service.HubService, manager *connection_manager.ConnectionManager) error {
 	address := fmt.Sprintf("0.0.0.0:%v", a.cfg.Port)
 
-	server := grpcserv.NewHubHandler(hubService, a.log)
+	server := grpcserv.NewHubHandler(hubService, manager, a.log)
 
 	lis, err := net.Listen("tcp", address)
 	if err != nil {

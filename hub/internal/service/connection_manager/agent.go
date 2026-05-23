@@ -13,10 +13,10 @@ import (
 )
 
 type AgentConnection struct {
-	stream             streamConn
+	stream             StreamConn
 	heartbeat          heartbeatStore
 	log                zerolog.Logger
-	status             statusAgent
+	status             StatusAgent
 	AgentID            string
 	response           *ResponseStore
 	ctx                context.Context
@@ -24,7 +24,7 @@ type AgentConnection struct {
 	heartbeatTimeoutMS int
 }
 
-func newAgentConnection(agentID string, stream streamConn, heartbeat heartbeatStore, status statusAgent, heartbeatTimeoutMS int, logger zerolog.Logger) *AgentConnection {
+func newAgentConnection(agentID string, stream StreamConn, heartbeat heartbeatStore, status StatusAgent, heartbeatTimeoutMS int, logger zerolog.Logger) *AgentConnection {
 	response := NewResponseStore()
 	logger = logger.With().Str("agentID", agentID).Logger()
 	ctx, cancel := context.WithCancel(stream.Context())

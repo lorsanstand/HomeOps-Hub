@@ -21,7 +21,7 @@ func NewConnectionManager(heartbeat heartbeatStore, status statusNotifier, logge
 	return &ConnectionManager{heartbeat: heartbeat, log: logger, status: status, agentConnStore: NewAgentConnStore()}
 }
 
-func (c *ConnectionManager) NewConnection(stream streamConn) error {
+func (c *ConnectionManager) NewConnection(stream StreamConn) error {
 	AgentID, err := agentIDFromMetadata(stream.Context())
 	if err != nil {
 		c.log.Error().Err(err).Msg("missing agent id in metadata")

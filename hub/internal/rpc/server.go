@@ -2,8 +2,10 @@ package rpc
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
+	"github.com/lorsanstand/HomeOps-Hub/hub/internal/service/connection_manager"
 	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -14,15 +16,20 @@ type HubService interface {
 	RegisterAgent(ctx context.Context, data domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error)
 }
 
-type HubHandler struct {
-	pb.UnimplementedHubServer
-	log        zerolog.Logger
-	GrpcServer *grpc.Server
-	hub        HubService
+type ConnectionManager interface {
+	NewConnection(stream connection_manager.StreamConn) error
 }
 
-func NewHubHandler(HubServ HubService, logger zerolog.Logger) *HubHandler {
-	hub := &HubHandler{log: logger, hub: HubServ}
+type HubHandler struct {
+	pb.UnimplementedHubServer
+	log           zerolog.Logger
+	GrpcServer    *grpc.Server
+	hub           HubService
+	streamManager ConnectionManager
+}
+
+func NewHubHandler(HubServ HubService, manager ConnectionManager, logger zerolog.Logger) *HubHandler {
+	hub := &HubHandler{log: logger, hub: HubServ, streamManager: manager}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterHubServer(grpcServer, hub)
@@ -42,9 +49,16 @@ func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgen
 	data := domain.ToDomainAgentRequest(request)
 	resp, err := h.hub.RegisterAgent(ctx, data)
 	if err != nil {
-		h.log.Error().Err(err).Str("agentID", request.AgentId).Msg("register agent request failed")
 		return domain.ToGRPCAgentResponse(resp), err
 	}
 	h.log.Info().Str("agentID", resp.AgentID).Msg("register agent request completed")
 	return domain.ToGRPCAgentResponse(resp), nil
+}
+
+func (h *HubHandler) StreamConnection(stream grpc.BidiStreamingServer[pb.AgentEvent, pb.ServerCommandRequest]) error {
+	err := h.streamManager.NewConnection(stream)
+	if err != nil {
+		return fmt.Errorf("accept connection: %w", err)
+	}
+	return nil
 }

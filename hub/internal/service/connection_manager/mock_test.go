@@ -109,7 +109,7 @@ type statusNotifierMock struct {
 	agentIDCh chan string
 }
 
-func (s *statusNotifierMock) New(AgentID string) statusAgent {
+func (s *statusNotifierMock) New(AgentID string) StatusAgent {
 	select {
 	case s.agentIDCh <- AgentID:
 	default:

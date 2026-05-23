@@ -7,7 +7,7 @@ import (
 	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
 )
 
-type streamConn interface {
+type StreamConn interface {
 	Send(request *pb.ServerCommandRequest) error
 	Recv() (*pb.AgentEvent, error)
 	Context() context.Context
@@ -17,11 +17,11 @@ type heartbeatStore interface {
 	CreateHeartbeat(ctx context.Context, heartbeat domainHub.CreateHeartbeatModel) error
 }
 
-type statusAgent interface {
+type StatusAgent interface {
 	Offline()
 	Online()
 }
 
 type statusNotifier interface {
-	New(AgentID string) statusAgent
+	New(agentID string) StatusAgent
 }
