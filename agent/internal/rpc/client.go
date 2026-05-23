@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
@@ -28,5 +29,12 @@ func (c *Connection) Hub() pb.HubClient {
 
 func (c *Connection) RegisterAgent(ctx context.Context, RegisterData domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error) {
 	ResponseData, err := c.Hub().RegisterAgent(ctx, new(domain.ToGRPCAgentRequest(RegisterData)))
-	return domain.ToDomainAgentResponse(ResponseData), err
+	if err != nil {
+		return domain.RegisterAgentResponse{}, fmt.Errorf("send register agent: %w", err)
+	}
+	response, err := domain.ToDomainAgentResponse(ResponseData)
+	if err != nil {
+		return domain.RegisterAgentResponse{}, fmt.Errorf("casting response: %w", err)
+	}
+	return response, nil
 }

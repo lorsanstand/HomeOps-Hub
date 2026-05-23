@@ -1,35 +1,38 @@
 package domain
 
 import (
+	"fmt"
+
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 )
 
-func ToDomainAgentRequest(request *pb.RegisterAgentRequest) RegisterAgentRequest {
+func ToDomainAgentRequest(request *pb.RegisterAgentRequest) (RegisterAgentRequest, error) {
 	if request == nil {
-		return RegisterAgentRequest{}
+		return RegisterAgentRequest{}, fmt.Errorf("request is empty")
 	}
 
 	return RegisterAgentRequest{
-		AgentID:   request.AgentId,
-		AgentName: request.AgentName,
+		AgentVersion: request.Version,
+		AgentID:      request.AgentId,
+		AgentName:    request.AgentName,
 		Host: HostInfo{
 			System:   request.Host.System,
 			Hostname: request.Host.Hostname,
 			Arch:     request.Host.Arch,
 		},
 		Capabilities: ToDomainCapabilities(request.Capability),
-	}
+	}, nil
 }
 
-func ToDomainAgentResponse(response *pb.RegisterAgentResponse) RegisterAgentResponse {
+func ToDomainAgentResponse(response *pb.RegisterAgentResponse) (RegisterAgentResponse, error) {
 	if response == nil {
-		return RegisterAgentResponse{}
+		return RegisterAgentResponse{}, fmt.Errorf("request is empty")
 	}
 
 	return RegisterAgentResponse{
 		AgentID:   response.AgentId,
 		Heartbeat: int(response.HeartbeatIntervalSecond),
-	}
+	}, nil
 }
 
 func ToDomainCapabilities(capability []*pb.Capability) []Capability {
