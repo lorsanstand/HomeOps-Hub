@@ -1,21 +1,22 @@
-package domain
+package rpc
 
 import (
 	"fmt"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
+	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
 )
 
-func ToDomainAgentRequest(request *pb.RegisterAgentRequest) (RegisterAgentRequest, error) {
+func ToDomainAgentRequest(request *pb.RegisterAgentRequest) (domain.RegisterAgentRequest, error) {
 	if request == nil {
-		return RegisterAgentRequest{}, fmt.Errorf("request is empty")
+		return domain.RegisterAgentRequest{}, fmt.Errorf("request is empty")
 	}
 
-	return RegisterAgentRequest{
+	return domain.RegisterAgentRequest{
 		AgentVersion: request.Version,
 		AgentID:      request.AgentId,
 		AgentName:    request.AgentName,
-		Host: HostInfo{
+		Host: domain.HostInfo{
 			System:   request.Host.System,
 			Hostname: request.Host.Hostname,
 			Arch:     request.Host.Arch,
@@ -24,26 +25,26 @@ func ToDomainAgentRequest(request *pb.RegisterAgentRequest) (RegisterAgentReques
 	}, nil
 }
 
-func ToDomainAgentResponse(response *pb.RegisterAgentResponse) (RegisterAgentResponse, error) {
+func ToDomainAgentResponse(response *pb.RegisterAgentResponse) (domain.RegisterAgentResponse, error) {
 	if response == nil {
-		return RegisterAgentResponse{}, fmt.Errorf("request is empty")
+		return domain.RegisterAgentResponse{}, fmt.Errorf("request is empty")
 	}
 
-	return RegisterAgentResponse{
+	return domain.RegisterAgentResponse{
 		AgentID:   response.AgentId,
 		Heartbeat: int(response.HeartbeatIntervalSecond),
 	}, nil
 }
 
-func ToDomainCapabilities(capability []*pb.Capability) []Capability {
-	var caps []Capability
+func ToDomainCapabilities(capability []*pb.Capability) []domain.Capability {
+	var caps []domain.Capability
 
 	for _, capa := range capability {
 		if capa == nil {
 			continue
 		}
 
-		caps = append(caps, Capability{
+		caps = append(caps, domain.Capability{
 			Name:      capa.Name,
 			Version:   capa.Version,
 			Reason:    capa.Reason,
@@ -54,7 +55,7 @@ func ToDomainCapabilities(capability []*pb.Capability) []Capability {
 	return caps
 }
 
-func ToGRPCAgentRequest(request RegisterAgentRequest) pb.RegisterAgentRequest {
+func ToGRPCAgentRequest(request domain.RegisterAgentRequest) pb.RegisterAgentRequest {
 	return pb.RegisterAgentRequest{
 		AgentId:   request.AgentID,
 		AgentName: request.AgentName,
@@ -68,11 +69,11 @@ func ToGRPCAgentRequest(request RegisterAgentRequest) pb.RegisterAgentRequest {
 	}
 }
 
-func ToGRPCAgentResponse(response RegisterAgentResponse) *pb.RegisterAgentResponse {
+func ToGRPCAgentResponse(response domain.RegisterAgentResponse) *pb.RegisterAgentResponse {
 	return &pb.RegisterAgentResponse{AgentId: response.AgentID, HeartbeatIntervalSecond: int64(response.Heartbeat)}
 }
 
-func ToGRPCCapability(caps []Capability) []*pb.Capability {
+func ToGRPCCapability(caps []domain.Capability) []*pb.Capability {
 	var capability []*pb.Capability
 	for _, capi := range caps {
 		capability = append(capability, &pb.Capability{
