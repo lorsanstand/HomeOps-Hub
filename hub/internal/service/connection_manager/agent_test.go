@@ -99,7 +99,9 @@ func TestAgentConnection_Heartbeat(t *testing.T) {
 
 func TestAgentConnection_Execute(t *testing.T) {
 	h := newAgentTestHarness(t, 5000)
-	go h.agent.Listen()
+	go func() {
+		_ = h.agent.Listen()
+	}()
 
 	// Данные для проверки
 	requestID := make(chan domainHub.AgentResponse)
@@ -203,7 +205,9 @@ func TestAgentConnection_ExecuteClose(t *testing.T) {
 	t.Cleanup(cancelExecute)
 
 	executeCh := make(chan struct{})
-	go h.agent.Listen()
+	go func() {
+		_ = h.agent.Listen()
+	}()
 
 	go func() {
 		_, err := h.agent.Execute(ctxExecute, domainHub.AgentRequest{
@@ -280,7 +284,9 @@ func TestAgentConnection_HeartbeatErrorDoesNotStop(t *testing.T) {
 	h.heartbeat.err = errors.New("db error")
 	h.heartbeat.mu.Unlock()
 
-	go h.agent.Listen()
+	go func() {
+		_ = h.agent.Listen()
+	}()
 	h.recvCh <- &pb.AgentEvent{AgentId: "agent-1", Event: &pb.AgentEvent_Heartbeat{
 		Heartbeat: &pb.Heartbeat{
 			Timestamp: time.Now().Unix(),
@@ -293,7 +299,9 @@ func TestAgentConnection_HeartbeatErrorDoesNotStop(t *testing.T) {
 
 func TestAgentConnection_ConcurrentExecute(t *testing.T) {
 	h := newAgentTestHarness(t, 5000)
-	go h.agent.Listen()
+	go func() {
+		_ = h.agent.Listen()
+	}()
 
 	responses := make(chan domainHub.AgentResponse, 2)
 
