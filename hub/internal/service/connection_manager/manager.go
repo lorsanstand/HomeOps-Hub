@@ -8,17 +8,16 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const heartbeatTimeoutMS = 6000
-
 type ConnectionManager struct {
-	heartbeat      heartbeatStore
-	log            zerolog.Logger
-	status         statusNotifier
-	agentConnStore *AgentConnStore
+	heartbeat        heartbeatStore
+	log              zerolog.Logger
+	status           statusNotifier
+	agentConnStore   *AgentConnStore
+	heartbeatTimeout int
 }
 
-func NewConnectionManager(heartbeat heartbeatStore, status statusNotifier, logger zerolog.Logger) *ConnectionManager {
-	return &ConnectionManager{heartbeat: heartbeat, log: logger, status: status, agentConnStore: NewAgentConnStore()}
+func NewConnectionManager(heartbeat heartbeatStore, status statusNotifier, heartbeatTimeoutMS int, logger zerolog.Logger) *ConnectionManager {
+	return &ConnectionManager{heartbeat: heartbeat, log: logger, status: status, agentConnStore: NewAgentConnStore(), heartbeatTimeout: heartbeatTimeoutMS + 600}
 }
 
 func (c *ConnectionManager) NewConnection(stream StreamConn) error {
@@ -32,7 +31,7 @@ func (c *ConnectionManager) NewConnection(stream StreamConn) error {
 
 	status := c.status.New(AgentID)
 
-	agent := newAgentConnection(AgentID, stream, c.heartbeat, status, heartbeatTimeoutMS, c.log)
+	agent := newAgentConnection(AgentID, stream, c.heartbeat, status, c.heartbeatTimeout, c.log)
 	c.agentConnStore.Add(AgentID, agent)
 	defer c.agentConnStore.Delete(AgentID)
 

@@ -9,14 +9,10 @@ import (
 )
 
 type Config struct {
-	DBHost     string `env:"DB_HOST"`
-	DBPort     int    `env:"DB_PORT"`
-	DBPassword string `env:"DB_PASS"`
-	DBUser     string `env:"DB_USER"`
-	DBName     string `env:"DB_NAME"`
-	LogLevel   string `env:"LOG_LEVEL" env-default:"INFO"`
-	Mode       string `env:"MODE" env-default:"DEV"`
-	Port       int    `env:"PORT" env-default:"9000"`
+	LogLevel  string `env:"LOG_LEVEL" env-default:"INFO"`
+	Mode      string `env:"MODE" env-default:"DEV"`
+	Port      int    `env:"PORT" env-default:"9000"`
+	Heartbeat int    `env:"HEARTBEAT" env-default:"5"`
 }
 
 func NewConfig() (*Config, error) {
@@ -31,16 +27,6 @@ func NewConfig() (*Config, error) {
 	}
 
 	return &cfg, nil
-}
-
-func (c *Config) GetURLPostgres() string {
-	return fmt.Sprintf(
-		"postgres://%v:%v@%v:%v/%v?sslmode=disable",
-		c.DBUser,
-		c.DBPassword,
-		c.DBHost,
-		c.DBPort,
-		c.DBName)
 }
 
 func (c *Config) GetLogLevel() zerolog.Level {

@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option go_package = "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeops";
+
+message PongResponse {
+  string pong = 1;
+}
+
+message RegisterAgentRequest {
+  string agent_id = 1;
+  string agent_name = 2;
+  string version = 3;
+  HostInfo host = 4;
+  repeated Capability capability = 5;
+}
+
+message HostInfo {
+  string system = 1;
+  string hostname = 2;
+  string arch = 3;
+}
+
+message Capability {
+  bool available = 1; // доступен ли
+  string version = 2; // версия раздела
+  string name = 3; // название раздела по типу докер или управление пк
+  string reason = 4; // причина если раздел не доступент
+  repeated CapabilityCommand command = 5; // команды раздела
+}
+
+message CapabilityCommand {
+  string name = 1; // название команды
+  repeated CommandsArgs opt_args = 2; // опциоанльные переменные
+  repeated CommandsArgs req_args = 3; // обязательные переменные
+  string version = 4; // версия команды
+  string description = 5; // описание команды для документации
+  string type_output = 7;
+}
+
+message CommandsArgs {
+  string name = 1; // название аргумента
+  string type = 2; // какой тип path int string bool
+  string description = 3; // описание для документации
+  string default = 4; // значение по умолчанию
+  repeated string enum = 5; // enum комманд по типу run stop restart
+  ArgValidation validation = 6;
+}
+
+message ArgValidation {
+  int64 min_value = 1; // для чисел
+  int64 max_value = 2; // для чисел
+  string pattern = 3; // для regex строк
+  repeated string allowed_exts = 4; // для путей и файлов по типу .zip .rar итд
+}
+
+message RegisterAgentResponse {
+  int64 heartbeat_interval_second = 1;
+  string agent_id = 2;
+}

@@ -12,8 +12,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-const HEARTBEAT = 5
-
 type Store interface {
 	NewAgent(ctx context.Context, agent domainHub.CreateAgentModel) error
 	GetAgentByAgentID(ctx context.Context, AgentID string) (domainHub.AgentModel, error)
@@ -21,12 +19,13 @@ type Store interface {
 }
 
 type HubService struct {
-	store Store
-	log   zerolog.Logger
+	store            Store
+	log              zerolog.Logger
+	heartbeatTimeout int
 }
 
-func NewHubService(store Store, logger zerolog.Logger) *HubService {
-	return &HubService{log: logger, store: store}
+func NewHubService(store Store, heartbeatTimeout int, logger zerolog.Logger) *HubService {
+	return &HubService{log: logger, store: store, heartbeatTimeout: heartbeatTimeout}
 }
 
 func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error) {
@@ -47,7 +46,7 @@ func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgen
 			return domain.RegisterAgentResponse{}, fmt.Errorf("update agent in db: %w", err)
 		}
 		h.log.Debug().Str("agentId", agent.AgentID).Msg("agent updated successfully")
-		return domain.RegisterAgentResponse{AgentID: agent.AgentID, Heartbeat: HEARTBEAT}, nil
+		return domain.RegisterAgentResponse{AgentID: agent.AgentID, Heartbeat: h.heartbeatTimeout}, nil
 	}
 
 	AgentID, err := hasher.MakeID(data.Host, data.AgentName)
@@ -62,5 +61,5 @@ func (h *HubService) RegisterAgent(ctx context.Context, data domain.RegisterAgen
 	if err := h.store.NewAgent(ctx, agentStore); err != nil {
 		return domain.RegisterAgentResponse{}, fmt.Errorf("insert new agent: %w", err)
 	}
-	return domain.RegisterAgentResponse{AgentID: AgentID, Heartbeat: HEARTBEAT}, nil
+	return domain.RegisterAgentResponse{AgentID: AgentID, Heartbeat: h.heartbeatTimeout}, nil
 }

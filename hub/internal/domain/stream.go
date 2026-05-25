@@ -23,7 +23,7 @@ type AgentAlert struct {
 }
 
 type SystemMetrics struct {
-	CpuUsage    float64
+	CPUUsage    float64
 	MemoryUsage float64
 	DiskUsage   float64
 }

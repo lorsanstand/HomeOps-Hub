@@ -15,7 +15,7 @@ func toCreateHeartbeatModel(agentID string, heartbeat *pb.AgentEvent_Heartbeat) 
 		Timestamp: timestamp,
 		Metrics: domainHub.SystemMetrics{
 			MemoryUsage: float64(heartbeat.Heartbeat.Metrics.MemoryUsage),
-			CpuUsage:    float64(heartbeat.Heartbeat.Metrics.CpuUsage),
+			CPUUsage:    float64(heartbeat.Heartbeat.Metrics.CpuUsage),
 			DiskUsage:   float64(heartbeat.Heartbeat.Metrics.DiskUsage),
 		},
 	}

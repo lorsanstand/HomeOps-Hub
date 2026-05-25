@@ -7,6 +7,7 @@ import (
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/service/connection_manager"
 	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
+	"github.com/lorsanstand/HomeOps-Hub/shared/mappers/rpc"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -46,13 +47,18 @@ func (h *HubHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*pb.PongRespon
 
 func (h *HubHandler) RegisterAgent(ctx context.Context, request *pb.RegisterAgentRequest) (*pb.RegisterAgentResponse, error) {
 	h.log.Debug().Str("agentID", request.AgentId).Str("agentName", request.AgentName).Msg("register agent request received")
-	data := domain.ToDomainAgentRequest(request)
+	data, err := rpc.ToDomainAgentRequest(request)
+	if err != nil {
+		h.log.Error().Err(err).Msg("failed to casting request")
+		return &pb.RegisterAgentResponse{}, ErrFailedRegister
+	}
 	resp, err := h.hub.RegisterAgent(ctx, data)
 	if err != nil {
-		return domain.ToGRPCAgentResponse(resp), err
+		h.log.Error().Err(err).Msg("failed register agent")
+		return rpc.ToGRPCAgentResponse(resp), ErrFailedRegister
 	}
 	h.log.Info().Str("agentID", resp.AgentID).Msg("register agent request completed")
-	return domain.ToGRPCAgentResponse(resp), nil
+	return rpc.ToGRPCAgentResponse(resp), nil
 }
 
 func (h *HubHandler) StreamConnection(stream grpc.BidiStreamingServer[pb.AgentEvent, pb.ServerCommandRequest]) error {
