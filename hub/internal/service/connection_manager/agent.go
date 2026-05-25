@@ -109,7 +109,7 @@ func (a *AgentConnection) listenHeartbeat(heartbeats <-chan domainHub.CreateHear
 				return
 			}
 			a.log.Debug().
-				Float64("cpu usage", heartbeat.Metrics.CpuUsage).
+				Float64("cpu usage", heartbeat.Metrics.CPUUsage).
 				Float64("disk usage", heartbeat.Metrics.DiskUsage).
 				Float64("memory usage", heartbeat.Metrics.MemoryUsage).Msg("")
 
