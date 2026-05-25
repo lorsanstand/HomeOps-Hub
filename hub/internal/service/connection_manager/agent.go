@@ -66,7 +66,6 @@ func (a *AgentConnection) Listen() error {
 				response := toAgentResponse(x)
 				ch <- response
 			}
-		default:
 		}
 	}
 }
