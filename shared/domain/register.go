@@ -19,6 +19,32 @@ type Capability struct {
 	Version   string
 	Name      string
 	Reason    string
+	Command   []CapabilityCommand
+}
+
+type CapabilityCommand struct {
+	Name         string
+	OptionalArgs []CommandArgs
+	RequiredArgs []CommandArgs
+	Version      string
+	Description  string
+	TypeOutput   string
+}
+
+type CommandArgs struct {
+	Name        string
+	Type        string
+	Description string
+	Default     string
+	Enum        []string
+	Validation  ArgValidation
+}
+
+type ArgValidation struct {
+	MinValue    int
+	MaxValue    int
+	Pattern     string
+	AllowedExts []string
 }
 
 type RegisterAgentResponse struct {

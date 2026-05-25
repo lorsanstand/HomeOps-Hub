@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeops";
+
 message ServerCommandRequest {
   string request_id = 1;
   string name = 2;

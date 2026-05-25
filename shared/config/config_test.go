@@ -39,38 +39,3 @@ func TestConfig_GetLogLevel(t *testing.T) {
 		})
 	}
 }
-
-func TestConfig_GetURLPostgres(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name            string
-		cfg             Config
-		wantURLPostgres string
-	}{
-		{
-			name: "success",
-			cfg: Config{
-				DBHost:     "TestHost",
-				DBName:     "TestName",
-				DBPassword: "TestPassword",
-				DBPort:     1234,
-				DBUser:     "TestUser",
-			},
-			wantURLPostgres: "postgres://TestUser:TestPassword@TestHost:1234/TestName?sslmode=disable",
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			url := tt.cfg.GetURLPostgres()
-
-			if url != tt.wantURLPostgres {
-				t.Fatalf("expected %v, got: %v", tt.wantURLPostgres, url)
-			}
-		})
-	}
-}

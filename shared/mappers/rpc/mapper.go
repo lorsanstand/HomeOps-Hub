@@ -36,27 +36,68 @@ func ToDomainAgentResponse(response *pb.RegisterAgentResponse) (domain.RegisterA
 	}, nil
 }
 
-func ToDomainCapabilities(capability []*pb.Capability) []domain.Capability {
-	var caps []domain.Capability
+func ToDomainCapabilities(capabilities []*pb.Capability) []domain.Capability {
+	domainCaps := make([]domain.Capability, len(capabilities))
 
-	for _, capa := range capability {
-		if capa == nil {
+	for id, capability := range capabilities {
+		if capability == nil {
 			continue
 		}
 
-		caps = append(caps, domain.Capability{
-			Name:      capa.Name,
-			Version:   capa.Version,
-			Reason:    capa.Reason,
-			Available: capa.Available,
-		})
+		domainCaps[id] = domain.Capability{
+			Name:      capability.Name,
+			Version:   capability.Version,
+			Reason:    capability.Reason,
+			Available: capability.Available,
+			Command:   ToDomainCapabilityCommands(capability.Command),
+		}
 	}
 
-	return caps
+	return domainCaps
 }
 
-func ToGRPCAgentRequest(request domain.RegisterAgentRequest) pb.RegisterAgentRequest {
-	return pb.RegisterAgentRequest{
+func ToDomainCapabilityCommands(commands []*pb.CapabilityCommand) []domain.CapabilityCommand {
+	domainCommand := make([]domain.CapabilityCommand, len(commands))
+
+	for id, command := range commands {
+		if command == nil {
+			continue
+		}
+
+		domainCommand[id] = domain.CapabilityCommand{
+			Name:         command.Name,
+			OptionalArgs: ToDomainCommandArgs(command.OptArgs),
+			RequiredArgs: ToDomainCommandArgs(command.ReqArgs),
+			Version:      command.Version,
+		}
+	}
+	return domainCommand
+}
+
+func ToDomainCommandArgs(args []*pb.CommandsArgs) []domain.CommandArgs {
+	DomainArgs := make([]domain.CommandArgs, len(args))
+
+	for id, arg := range args {
+		DomainArgs[id] = domain.CommandArgs{
+			Name:        arg.Name,
+			Type:        arg.Type,
+			Default:     arg.Default,
+			Description: arg.Description,
+			Enum:        arg.Enum,
+			Validation: domain.ArgValidation{
+				AllowedExts: arg.Validation.AllowedExts,
+				MaxValue:    int(arg.Validation.MaxValue),
+				MinValue:    int(arg.Validation.MinValue),
+				Pattern:     arg.Validation.Pattern,
+			},
+		}
+	}
+
+	return DomainArgs
+}
+
+func ToGRPCAgentRequest(request domain.RegisterAgentRequest) *pb.RegisterAgentRequest {
+	return &pb.RegisterAgentRequest{
 		AgentId:   request.AgentID,
 		AgentName: request.AgentName,
 		Host: &pb.HostInfo{
@@ -73,15 +114,55 @@ func ToGRPCAgentResponse(response domain.RegisterAgentResponse) *pb.RegisterAgen
 	return &pb.RegisterAgentResponse{AgentId: response.AgentID, HeartbeatIntervalSecond: int64(response.Heartbeat)}
 }
 
-func ToGRPCCapability(caps []domain.Capability) []*pb.Capability {
-	var capability []*pb.Capability
-	for _, capi := range caps {
-		capability = append(capability, &pb.Capability{
-			Name:      capi.Name,
-			Available: capi.Available,
-			Version:   capi.Version,
-			Reason:    capi.Reason,
-		})
+func ToGRPCCapability(capabilities []domain.Capability) []*pb.Capability {
+	GRPCCapabilities := make([]*pb.Capability, len(capabilities))
+
+	for id, capability := range capabilities {
+		GRPCCapabilities[id] = &pb.Capability{
+			Name:      capability.Name,
+			Available: capability.Available,
+			Version:   capability.Version,
+			Reason:    capability.Reason,
+			Command:   ToGRPCCapabilityCommands(capability.Command),
+		}
 	}
-	return capability
+	return GRPCCapabilities
+}
+
+func ToGRPCCapabilityCommands(commands []domain.CapabilityCommand) []*pb.CapabilityCommand {
+	GRPCCommands := make([]*pb.CapabilityCommand, len(commands))
+
+	for id, command := range commands {
+		GRPCCommands[id] = &pb.CapabilityCommand{
+			Name:       command.Name,
+			Version:    command.Version,
+			OptArgs:    ToGRPCCommandArgs(command.OptionalArgs),
+			ReqArgs:    ToGRPCCommandArgs(command.RequiredArgs),
+			TypeOutput: command.TypeOutput,
+		}
+	}
+
+	return GRPCCommands
+}
+
+func ToGRPCCommandArgs(args []domain.CommandArgs) []*pb.CommandsArgs {
+	GRPCArgs := make([]*pb.CommandsArgs, len(args))
+
+	for id, arg := range args {
+		GRPCArgs[id] = &pb.CommandsArgs{
+			Name:        arg.Name,
+			Type:        arg.Type,
+			Default:     arg.Default,
+			Description: arg.Description,
+			Enum:        arg.Enum,
+			Validation: &pb.ArgValidation{
+				AllowedExts: arg.Validation.AllowedExts,
+				MaxValue:    int64(arg.Validation.MaxValue),
+				MinValue:    int64(arg.Validation.MinValue),
+				Pattern:     arg.Validation.Pattern,
+			},
+		}
+	}
+
+	return GRPCArgs
 }

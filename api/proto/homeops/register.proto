@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops;homeops";
+
 message PongResponse {
   string pong = 1;
 }
@@ -32,6 +34,7 @@ message CapabilityCommand {
   repeated CommandsArgs req_args = 3; // обязательные переменные
   string version = 4; // версия команды
   string description = 5; // описание команды для документации
+  string type_output = 7;
 }
 
 message CommandsArgs {

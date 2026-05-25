@@ -29,7 +29,7 @@ func (c *Connection) Hub() pb.HubClient {
 }
 
 func (c *Connection) RegisterAgent(ctx context.Context, RegisterData domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error) {
-	ResponseData, err := c.Hub().RegisterAgent(ctx, new(rpc.ToGRPCAgentRequest(RegisterData)))
+	ResponseData, err := c.Hub().RegisterAgent(ctx, rpc.ToGRPCAgentRequest(RegisterData))
 	if err != nil {
 		return domain.RegisterAgentResponse{}, fmt.Errorf("send register agent: %w", err)
 	}
