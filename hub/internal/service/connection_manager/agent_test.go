@@ -158,7 +158,7 @@ func TestAgentConnection_HeartbeatTimeout(t *testing.T) {
 	timeout := time.After(2 * time.Second)
 	gotListen := false
 	gotExec := false
-	for !(gotListen && gotExec) {
+	for !gotListen && !gotExec {
 		select {
 		case err := <-listenDone:
 			assert.ErrorIs(t, err, context.Canceled)
