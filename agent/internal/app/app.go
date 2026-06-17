@@ -32,7 +32,6 @@ func NewApp() (*App, error) {
 	}
 
 	logger := log.NewLogger(cfg)
-	logger = logger.With().Str("component", "internal.app").Logger()
 	logger = logger.With().Str("name", cfg.AppName).Logger()
 
 	sett, err := settings.ReadSettings(cfg.SettingsPath)

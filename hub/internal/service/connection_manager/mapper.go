@@ -4,7 +4,7 @@ import (
 	"time"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
-	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
+	domainHub "github.com/lorsanstand/HomeOps-Hub/shared/domain"
 )
 
 func toCreateHeartbeatModel(agentID string, heartbeat *pb.AgentEvent_Heartbeat) domainHub.CreateHeartbeatModel {

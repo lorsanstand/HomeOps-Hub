@@ -5,8 +5,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
-
 	"github.com/rs/zerolog"
 )
 
@@ -23,27 +21,21 @@ type DockerService struct {
 func NewDockerService(api dockerAPI, logger zerolog.Logger) *DockerService {
 	return &DockerService{
 		dockerClient: api,
-		log:          logger.With().Str("component", "internal.serivce.docker").Logger(),
+		log:          logger,
 	}
 }
 
-func (d *DockerService) CheckDockerDaemon(ctx context.Context) error {
+func (d *DockerService) CheckDockerDaemon(ctx context.Context, args map[string]string) (string, error) {
 	_, err := d.dockerClient.Ping(ctx)
 	d.log.Debug().Msg("ping docker")
-	return err
+	if err != nil {
+		return "", err
+	}
+	return "successful", nil
 }
 
 func (d *DockerService) ContainersList(ctx context.Context) ([]container.Summary, error) {
 	ContainersList, err := d.dockerClient.ContainerList(ctx, container.ListOptions{})
 	d.log.Debug().Msg("get container list")
 	return ContainersList, err
-}
-
-func (d *DockerService) Capability() domain.Capability {
-	return domain.Capability{
-		Available: true,
-		Version:   "0",
-		Name:      "docker",
-		Reason:    "",
-	}
 }

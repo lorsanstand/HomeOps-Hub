@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
-	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
+	domainHub "github.com/lorsanstand/HomeOps-Hub/shared/domain"
 	"github.com/rs/zerolog"
 )
 

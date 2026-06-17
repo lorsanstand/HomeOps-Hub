@@ -77,7 +77,7 @@ func toDomainCapabilities(caps []byte) []domain.Capability {
 	return capabilities
 }
 
-func toDBHeartbeat(heartbeat domainHub.CreateHeartbeatModel) gen2.InsertHeartbeatParams {
+func toDBHeartbeat(heartbeat domain.CreateHeartbeatModel) gen2.InsertHeartbeatParams {
 
 	return gen2.InsertHeartbeatParams{
 		AgentID:            heartbeat.AgentID,
@@ -88,12 +88,12 @@ func toDBHeartbeat(heartbeat domainHub.CreateHeartbeatModel) gen2.InsertHeartbea
 	}
 }
 
-func toHeartBeatModel(heartbeat gen2.Heartbeat) domainHub.HeartbeatModel {
-	return domainHub.HeartbeatModel{
+func toHeartBeatModel(heartbeat gen2.Heartbeat) domain.HeartbeatModel {
+	return domain.HeartbeatModel{
 		Timestamp: heartbeat.HeartbeatTimestamp,
 		AgentID:   heartbeat.AgentID,
 		ID:        int(heartbeat.ID),
-		Metrics: domainHub.SystemMetrics{
+		Metrics: domain.SystemMetrics{
 			CPUUsage:    heartbeat.CpuUsage,
 			DiskUsage:   heartbeat.DiskUsage,
 			MemoryUsage: heartbeat.MemoryUsage,

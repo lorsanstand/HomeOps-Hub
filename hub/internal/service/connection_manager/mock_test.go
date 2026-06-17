@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	pb "github.com/lorsanstand/HomeOps-Hub/api/gen/homeops"
-	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
+	domainHub "github.com/lorsanstand/HomeOps-Hub/shared/domain"
 )
 
 type streamMock struct {

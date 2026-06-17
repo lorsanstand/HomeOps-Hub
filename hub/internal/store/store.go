@@ -7,6 +7,7 @@ import (
 
 	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
 	"github.com/lorsanstand/HomeOps-Hub/hub/internal/store/sqlc/gen"
+	"github.com/lorsanstand/HomeOps-Hub/shared/domain"
 )
 
 type HubStore struct {
@@ -36,19 +37,19 @@ func (h *HubStore) UpdateAgentByID(ctx context.Context, ID int, updateAgent doma
 	return h.queries.UpdateAgentByID(ctx, data)
 }
 
-func (h *HubStore) CreateHeartbeat(ctx context.Context, heartbeat domainHub.CreateHeartbeatModel) error {
+func (h *HubStore) CreateHeartbeat(ctx context.Context, heartbeat domain.CreateHeartbeatModel) error {
 	data := toDBHeartbeat(heartbeat)
 	return h.queries.InsertHeartbeat(ctx, data)
 }
 
-func (h *HubStore) GetHeartbeatsByIDAfter(ctx context.Context, agentID string, timestamp time.Time) ([]domainHub.HeartbeatModel, error) {
+func (h *HubStore) GetHeartbeatsByIDAfter(ctx context.Context, agentID string, timestamp time.Time) ([]domain.HeartbeatModel, error) {
 	data := gen.SelectHeartbeatsAfterParams{AgentID: agentID, Timestamp: timestamp}
 	heartbeats, err := h.queries.SelectHeartbeatsAfter(ctx, data)
 	if err != nil {
-		return []domainHub.HeartbeatModel{}, err
+		return []domain.HeartbeatModel{}, err
 	}
 
-	heartbeatsModel := make([]domainHub.HeartbeatModel, len(heartbeats))
+	heartbeatsModel := make([]domain.HeartbeatModel, len(heartbeats))
 
 	for i, heartbeat := range heartbeats {
 		heartbeatsModel[i] = toHeartBeatModel(heartbeat)

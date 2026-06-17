@@ -3,7 +3,7 @@ package connection_manager
 import (
 	"sync"
 
-	domainHub "github.com/lorsanstand/HomeOps-Hub/hub/internal/domain"
+	domainHub "github.com/lorsanstand/HomeOps-Hub/shared/domain"
 )
 
 type AgentConnStore struct {

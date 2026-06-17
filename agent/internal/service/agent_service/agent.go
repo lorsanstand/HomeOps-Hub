@@ -9,19 +9,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type Collector interface {
-	GatherInfoSystem() (domain.HostInfo, []domain.Capability)
-}
-
-type Settings interface {
-	InsertAgentID(agentID string) error
-	GetAgentID() string
-}
-
-type HubConnection interface {
-	RegisterAgent(ctx context.Context, RegisterData domain.RegisterAgentRequest) (domain.RegisterAgentResponse, error)
-}
-
 type AgentService struct {
 	collect   Collector
 	conn      HubConnection
@@ -38,8 +25,6 @@ func NewAgentService(
 	cfg *config_yaml.AgentConfig,
 	logger zerolog.Logger,
 ) *AgentService {
-	logger = logger.With().Str("component", "internal.service.agent_serivce").Logger()
-
 	return &AgentService{collect: collector, conn: conn, cfg: cfg, log: logger, settings: settings}
 }
 
