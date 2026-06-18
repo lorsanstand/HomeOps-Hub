@@ -36,16 +36,15 @@ func ToDomainAgentResponse(response *pb.RegisterAgentResponse) (domain.RegisterA
 	}, nil
 }
 
-func ToDomainCapabilities(capabilities []*pb.Capability) []domain.Capability {
-	domainCaps := make([]domain.Capability, len(capabilities))
+func ToDomainCapabilities(capabilities map[string]*pb.Capability) map[string]domain.Capability {
+	domainCaps := make(map[string]domain.Capability, len(capabilities))
 
-	for id, capability := range capabilities {
+	for name, capability := range capabilities {
 		if capability == nil {
 			continue
 		}
 
-		domainCaps[id] = domain.Capability{
-			Name:      capability.Name,
+		domainCaps[name] = domain.Capability{
 			Version:   capability.Version,
 			Reason:    capability.Reason,
 			Available: capability.Available,
@@ -56,16 +55,15 @@ func ToDomainCapabilities(capabilities []*pb.Capability) []domain.Capability {
 	return domainCaps
 }
 
-func ToDomainCapabilityCommands(commands []*pb.CapabilityCommand) []domain.CapabilityCommand {
-	domainCommand := make([]domain.CapabilityCommand, len(commands))
+func ToDomainCapabilityCommands(commands map[string]*pb.CapabilityCommand) map[string]domain.CapabilityCommand {
+	domainCommand := make(map[string]domain.CapabilityCommand, len(commands))
 
-	for id, command := range commands {
+	for name, command := range commands {
 		if command == nil {
 			continue
 		}
 
-		domainCommand[id] = domain.CapabilityCommand{
-			Name:         command.Name,
+		domainCommand[name] = domain.CapabilityCommand{
 			OptionalArgs: ToDomainCommandArgs(command.OptArgs),
 			RequiredArgs: ToDomainCommandArgs(command.ReqArgs),
 			Version:      command.Version,
@@ -74,12 +72,11 @@ func ToDomainCapabilityCommands(commands []*pb.CapabilityCommand) []domain.Capab
 	return domainCommand
 }
 
-func ToDomainCommandArgs(args []*pb.CommandsArgs) []domain.CommandArgs {
-	DomainArgs := make([]domain.CommandArgs, len(args))
+func ToDomainCommandArgs(args map[string]*pb.CommandsArgs) map[string]domain.CommandArgs {
+	DomainArgs := make(map[string]domain.CommandArgs, len(args))
 
-	for id, arg := range args {
-		DomainArgs[id] = domain.CommandArgs{
-			Name:        arg.Name,
+	for name, arg := range args {
+		DomainArgs[name] = domain.CommandArgs{
 			Type:        arg.Type,
 			Default:     arg.Default,
 			Description: arg.Description,
@@ -114,12 +111,11 @@ func ToGRPCAgentResponse(response domain.RegisterAgentResponse) *pb.RegisterAgen
 	return &pb.RegisterAgentResponse{AgentId: response.AgentID, HeartbeatIntervalSecond: int64(response.Heartbeat)}
 }
 
-func ToGRPCCapability(capabilities []domain.Capability) []*pb.Capability {
-	GRPCCapabilities := make([]*pb.Capability, len(capabilities))
+func ToGRPCCapability(capabilities map[string]domain.Capability) map[string]*pb.Capability {
+	GRPCCapabilities := make(map[string]*pb.Capability, len(capabilities))
 
-	for id, capability := range capabilities {
-		GRPCCapabilities[id] = &pb.Capability{
-			Name:      capability.Name,
+	for name, capability := range capabilities {
+		GRPCCapabilities[name] = &pb.Capability{
 			Available: capability.Available,
 			Version:   capability.Version,
 			Reason:    capability.Reason,
@@ -129,12 +125,11 @@ func ToGRPCCapability(capabilities []domain.Capability) []*pb.Capability {
 	return GRPCCapabilities
 }
 
-func ToGRPCCapabilityCommands(commands []domain.CapabilityCommand) []*pb.CapabilityCommand {
-	GRPCCommands := make([]*pb.CapabilityCommand, len(commands))
+func ToGRPCCapabilityCommands(commands map[string]domain.CapabilityCommand) map[string]*pb.CapabilityCommand {
+	GRPCCommands := make(map[string]*pb.CapabilityCommand, len(commands))
 
-	for id, command := range commands {
-		GRPCCommands[id] = &pb.CapabilityCommand{
-			Name:       command.Name,
+	for name, command := range commands {
+		GRPCCommands[name] = &pb.CapabilityCommand{
 			Version:    command.Version,
 			OptArgs:    ToGRPCCommandArgs(command.OptionalArgs),
 			ReqArgs:    ToGRPCCommandArgs(command.RequiredArgs),
@@ -145,12 +140,11 @@ func ToGRPCCapabilityCommands(commands []domain.CapabilityCommand) []*pb.Capabil
 	return GRPCCommands
 }
 
-func ToGRPCCommandArgs(args []domain.CommandArgs) []*pb.CommandsArgs {
-	GRPCArgs := make([]*pb.CommandsArgs, len(args))
+func ToGRPCCommandArgs(args map[string]domain.CommandArgs) map[string]*pb.CommandsArgs {
+	GRPCArgs := make(map[string]*pb.CommandsArgs, len(args))
 
-	for id, arg := range args {
-		GRPCArgs[id] = &pb.CommandsArgs{
-			Name:        arg.Name,
+	for name, arg := range args {
+		GRPCArgs[name] = &pb.CommandsArgs{
 			Type:        arg.Type,
 			Default:     arg.Default,
 			Description: arg.Description,

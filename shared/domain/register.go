@@ -5,7 +5,7 @@ type RegisterAgentRequest struct {
 	AgentName    string
 	AgentVersion string
 	Host         HostInfo
-	Capabilities []Capability
+	Capabilities map[string]Capability
 }
 
 type HostInfo struct {
@@ -17,22 +17,19 @@ type HostInfo struct {
 type Capability struct {
 	Available bool
 	Version   string
-	Name      string
 	Reason    string
-	Command   []CapabilityCommand
+	Command   map[string]CapabilityCommand
 }
 
 type CapabilityCommand struct {
-	Name         string
-	OptionalArgs []CommandArgs
-	RequiredArgs []CommandArgs
+	OptionalArgs map[string]CommandArgs
+	RequiredArgs map[string]CommandArgs
 	Version      string
 	Description  string
 	TypeOutput   string
 }
 
 type CommandArgs struct {
-	Name        string
 	Type        string
 	Description string
 	Default     string

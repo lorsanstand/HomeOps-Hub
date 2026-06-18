@@ -11,7 +11,7 @@ message RegisterAgentRequest {
   string agent_name = 2;
   string version = 3;
   HostInfo host = 4;
-  repeated Capability capability = 5;
+  map<string, Capability> capability = 5;
 }
 
 message HostInfo {
@@ -23,22 +23,22 @@ message HostInfo {
 message Capability {
   bool available = 1; // доступен ли
   string version = 2; // версия раздела
-  string name = 3; // название раздела по типу докер или управление пк
+//  string name = 3; // название раздела по типу докер или управление пк
   string reason = 4; // причина если раздел не доступент
-  repeated CapabilityCommand command = 5; // команды раздела
+  map<string, CapabilityCommand> command = 5; // команды раздела
 }
 
 message CapabilityCommand {
-  string name = 1; // название команды
-  repeated CommandsArgs opt_args = 2; // опциоанльные переменные
-  repeated CommandsArgs req_args = 3; // обязательные переменные
+//  string name = 1; // название команды
+  map<string, CommandsArgs> opt_args = 2; // опциоанльные переменные
+  map<string, CommandsArgs> req_args = 3; // обязательные переменные
   string version = 4; // версия команды
   string description = 5; // описание команды для документации
   string type_output = 7;
 }
 
 message CommandsArgs {
-  string name = 1; // название аргумента
+//  string name = 1; // название аргумента
   string type = 2; // какой тип path int string bool
   string description = 3; // описание для документации
   string default = 4; // значение по умолчанию
